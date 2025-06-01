@@ -1,0 +1,194 @@
+syntax = "proto3";
+
+package nacha;
+option go_package = "github.com/nacha-service/api/proto";
+
+service NachaService {
+    // Validate a NACHA file
+    rpc ValidateFile(FileRequest) returns (ValidationResponse) {}
+    
+    // Create a new NACHA file
+    rpc CreateFile(NachaFileRequest) returns (FileResponse) {}
+    
+    // Export NACHA file to different formats
+    rpc ExportFile(ExportRequest) returns (ExportResponse) {}
+    
+    // View complete file details
+    rpc ViewFile(FileRequest) returns (FileDetailsResponse) {}
+    
+    // View specific batch or entry details
+    rpc ViewDetails(DetailRequest) returns (DetailResponse) {}
+}
+
+message FileRequest {
+    bytes file_content = 1;
+    string file_path = 2;
+}
+
+message ValidationResponse {
+    bool is_valid = 1;
+    repeated ValidationError errors = 2;
+}
+
+message ValidationError {
+    string error_code = 1;
+    string message = 2;
+    string location = 3;
+}
+
+message NachaFileRequest {
+    FileHeader file_header = 1;
+    repeated BatchRequest batches = 2;
+    FileControl file_control = 3;
+}
+
+message FileHeader {
+    string record_type = 1;
+    string priority_code = 2;
+    string immediate_destination = 3;
+    string immediate_origin = 4;
+    string file_creation_date = 5;
+    string file_creation_time = 6;
+    string file_id_modifier = 7;
+    string record_size = 8;
+    string blocking_factor = 9;
+    string format_code = 10;
+    string immediate_destination_name = 11;
+    string immediate_origin_name = 12;
+    string reference_code = 13;
+}
+
+message BatchRequest {
+    BatchHeader header = 1;
+    repeated EntryDetailRequest entries = 2;
+    BatchControl control = 3;
+}
+
+message BatchHeader {
+    string record_type = 1;
+    string service_class_code = 2;
+    string company_name = 3;
+    string company_discretionary_data = 4;
+    string company_identification = 5;
+    string standard_entry_class = 6;
+    string company_entry_description = 7;
+    string company_descriptive_date = 8;
+    string effective_entry_date = 9;
+    string settlement_date = 10;
+    string originator_status_code = 11;
+    string originating_dfi_identification = 12;
+    string batch_number = 13;
+}
+
+message EntryDetailRequest {
+    string record_type = 1;
+    string transaction_code = 2;
+    string receiving_dfi_identification = 3;
+    string check_digit = 4;
+    string dfi_account_number = 5;
+    int64 amount = 6;
+    string individual_identification_number = 7;
+    string individual_name = 8;
+    string discretionary_data = 9;
+    string addenda_record_indicator = 10;
+    string trace_number = 11;
+    repeated AddendaRecord addenda_records = 12;
+}
+
+message AddendaRecord {
+    string addenda_type_code = 1;
+    string payment_related_information = 2;
+    string addenda_sequence_number = 3;
+    string entry_detail_sequence_number = 4;
+}
+
+message BatchControl {
+    string record_type = 1;
+    string service_class_code = 2;
+    int32 entry_addenda_count = 3;
+    string entry_hash = 4;
+    int64 total_debit_amount = 5;
+    int64 total_credit_amount = 6;
+    string company_identification = 7;
+    string message_authentication_code = 8;
+    string reserved = 9;
+    string originating_dfi_identification = 10;
+    string batch_number = 11;
+}
+
+message FileControl {
+    string record_type = 1;
+    int32 batch_count = 2;
+    int32 block_count = 3;
+    int32 entry_addenda_count = 4;
+    string entry_hash = 5;
+    int64 total_debit_amount = 6;
+    int64 total_credit_amount = 7;
+    string reserved = 8;
+}
+
+message FileResponse {
+    bytes file_content = 1;
+    string message = 2;
+}
+
+message ExportRequest {
+    bytes file_content = 1;
+    ExportFormat format = 2;
+}
+
+enum ExportFormat {
+    JSON = 0;
+    CSV = 1;
+    SQL = 2;
+    HTML = 3;
+    PDF = 4;
+    TXT = 5;
+    PARQUET = 6;
+}
+
+message ExportResponse {
+    bytes exported_content = 1;
+    string file_type = 2;
+    string message = 3;
+}
+
+message FileDetailsResponse {
+    FileHeader file_header = 1;
+    repeated BatchDetails batches = 2;
+    FileControl file_control = 3;
+    map<string, string> summary = 4;
+}
+
+message BatchDetails {
+    BatchHeader header = 1;
+    repeated EntryDetail entries = 2;
+    BatchControl control = 3;
+}
+
+message DetailRequest {
+    bytes file_content = 1;
+    string detail_type = 2;  // "batch" or "entry"
+    string identifier = 3;   // batch number or trace number
+}
+
+message DetailResponse {
+    oneof detail {
+        BatchDetails batch = 1;
+        EntryDetail entry = 2;
+    }
+}
+
+message EntryDetail {
+    string transaction_code = 1;
+    string receiving_dfi_identification = 2;
+    string check_digit = 3;
+    string dfi_account_number = 4;
+    int64 amount = 5;
+    string individual_identification_number = 6;
+    string individual_name = 7;
+    string discretionary_data = 8;
+    string addenda_record_indicator = 9;
+    string trace_number = 10;
+    repeated AddendaRecord addenda_records = 11;
+} 

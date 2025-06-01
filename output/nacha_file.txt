@@ -1,0 +1,87 @@
+=== FILE HEADER ===
+Priority Code: 01
+Immediate Destination: 076401251
+Immediate Origin: 0764012512
+File Creation Date: 2001-01-01
+File Creation Time: 1037
+File ID Modifier: A
+Record Size: 094
+Blocking Factor: 10
+Format Code: 1
+Destination Name: BANCO DO BRASIL
+Origin Name: EMPRESA EXEMPLO
+Reference Code: 
+
+=== BATCH 1 ===
+--- Batch Header ---
+Service Class Code: 225
+Company Name: EMPRESA EXEMPLO
+Company Discretionary Data: PAGAMENTO SALARIO
+Company Identification: 0764012512
+Standard Entry Class: PPD
+Company Entry Description: SALARIO
+Company Descriptive Date: 250601
+Settlement Date: 
+Originator Status Code: 1
+Originating DFI: 07640125
+
+--- Entry 1 ---
+Transaction Code: 22
+Receiving DFI: 07640125
+Check Digit: 1
+DFI Account Number: 123456789
+Amount: $1234.00
+Individual ID Number: 0
+Individual Name: JOAO DA SILVA
+Discretionary Data: 0
+Addenda Record Indicator: 1
+Trace Number: 076401250000000
+
+--- Addenda Records ---
+Addenda 1:
+  Type Code: 05
+  Payment Related Information: PAGAMENTO REFERENTE AO MES DE MAIO 2023
+  Sequence Number: 0001
+  Entry Detail Sequence Number: 0000001
+
+--- Entry 2 ---
+Transaction Code: 22
+Receiving DFI: 07640125
+Check Digit: 1
+DFI Account Number: 234567890
+Amount: $987.00
+Individual ID Number: 0
+Individual Name: MARIA SANTOS
+Discretionary Data: 0
+Addenda Record Indicator: 0
+Trace Number: 076401250000000
+
+--- Entry 3 ---
+Transaction Code: 22
+Receiving DFI: 07640125
+Check Digit: 1
+DFI Account Number: 345678901
+Amount: $1456.00
+Individual ID Number: 0
+Individual Name: PEDRO SOUZA
+Discretionary Data: 0
+Addenda Record Indicator: 0
+Trace Number: 076401250000000
+
+--- Batch Control ---
+Service Class Code: 225
+Entry/Addenda Count: 3
+Entry Hash: 0022920375
+Total Debit Amount: $367700.00
+Total Credit Amount: $7.64
+Company Identification: 0125120764
+Originating DFI: 
+Batch Number: %!d(string=)
+
+=== FILE CONTROL ===
+Batch Count: 1
+Block Count: 0
+Entry/Addenda Count: 3
+Entry Hash: 0022920375
+Total Debit Amount: $367700.00
+Total Credit Amount: $0.00

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NACHA File Details</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2, h3 { color: #333; }
+        .section { margin: 20px 0; padding: 10px; border: 1px solid #ddd; }
+        .entry { margin: 10px 0; padding: 10px; background-color: #f9f9f9; }
+        .addenda { margin-left: 20px; padding: 5px; background-color: #f0f0f0; }
+        .label { font-weight: bold; }
+        .amount { color: #006400; }
+    </style>
+</head>
+<body>
+    <h1>NACHA File Details</h1>
+    
+    <div class="section">
+        <h2>File Header</h2>
+        <p><span class="label">Priority Code:</span> 01</p>
+        <p><span class="label">Immediate Destination:</span> 076401251</p>
+        <p><span class="label">Immediate Origin:</span> 0764012512</p>
+        <p><span class="label">File Creation Date:</span> 2001-01-01</p>
+        <p><span class="label">File Creation Time:</span> 1037</p>
+        <p><span class="label">File ID Modifier:</span> A</p>
+        <p><span class="label">Record Size:</span> 094</p>
+        <p><span class="label">Blocking Factor:</span> 10</p>
+        <p><span class="label">Format Code:</span> 1</p>
+        <p><span class="label">Destination Name:</span> BANCO DO BRASIL</p>
+        <p><span class="label">Origin Name:</span> EMPRESA EXEMPLO</p>
+        <p><span class="label">Reference Code:</span> </p>
+    </div>
+
+    
+    <div class="section">
+        <h2>Batch 1</h2>
+        <h3>Batch Header</h3>
+        <p><span class="label">Service Class Code:</span> 225</p>
+        <p><span class="label">Company Name:</span> EMPRESA EXEMPLO</p>
+        <p><span class="label">Company Discretionary Data:</span> PAGAMENTO SALARIO</p>
+        <p><span class="label">Company Identification:</span> 0764012512</p>
+        <p><span class="label">Standard Entry Class:</span> PPD</p>
+        <p><span class="label">Company Entry Description:</span> SALARIO</p>
+        <p><span class="label">Company Descriptive Date:</span> 250601</p>
+        <p><span class="label">Settlement Date:</span> </p>
+        <p><span class="label">Originator Status Code:</span> 1</p>
+        <p><span class="label">Originating DFI:</span> 07640125</p>
+
+        <h3>Entries</h3>
+        
+        <div class="entry">
+            <h4>Entry 1</h4>
+            <p><span class="label">Transaction Code:</span> 22</p>
+            <p><span class="label">Receiving DFI:</span> 07640125</p>
+            <p><span class="label">Check Digit:</span> 1</p>
+            <p><span class="label">DFI Account Number:</span> 123456789</p>
+            <p><span class="label">Amount:</span> <span class="amount">$1234.00</span></p>
+            <p><span class="label">Individual ID Number:</span> 0</p>
+            <p><span class="label">Individual Name:</span> JOAO DA SILVA</p>
+            <p><span class="label">Discretionary Data:</span> 0</p>
+            <p><span class="label">Addenda Record Indicator:</span> 1</p>
+            <p><span class="label">Trace Number:</span> 076401250000000</p>
+
+            
+            <div class="addenda">
+                <h4>Addenda Records</h4>
+                
+                <div>
+                    <p><span class="label">Type Code:</span> 05</p>
+                    <p><span class="label">Payment Related Information:</span> PAGAMENTO REFERENTE AO MES DE MAIO 2023</p>
+                    <p><span class="label">Sequence Number:</span> 0001</p>
+                    <p><span class="label">Entry Detail Sequence Number:</span> 0000001</p>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <div class="entry">
+            <h4>Entry 2</h4>
+            <p><span class="label">Transaction Code:</span> 22</p>
+            <p><span class="label">Receiving DFI:</span> 07640125</p>
+            <p><span class="label">Check Digit:</span> 1</p>
+            <p><span class="label">DFI Account Number:</span> 234567890</p>
+            <p><span class="label">Amount:</span> <span class="amount">$987.00</span></p>
+            <p><span class="label">Individual ID Number:</span> 0</p>
+            <p><span class="label">Individual Name:</span> MARIA SANTOS</p>
+            <p><span class="label">Discretionary Data:</span> 0</p>
+            <p><span class="label">Addenda Record Indicator:</span> 0</p>
+            <p><span class="label">Trace Number:</span> 076401250000000</p>
+
+            
+        </div>
+        
+        <div class="entry">
+            <h4>Entry 3</h4>
+            <p><span class="label">Transaction Code:</span> 22</p>
+            <p><span class="label">Receiving DFI:</span> 07640125</p>
+            <p><span class="label">Check Digit:</span> 1</p>
+            <p><span class="label">DFI Account Number:</span> 345678901</p>
+            <p><span class="label">Amount:</span> <span class="amount">$1456.00</span></p>
+            <p><span class="label">Individual ID Number:</span> 0</p>
+            <p><span class="label">Individual Name:</span> PEDRO SOUZA</p>
+            <p><span class="label">Discretionary Data:</span> 0</p>
+            <p><span class="label">Addenda Record Indicator:</span> 0</p>
+            <p><span class="label">Trace Number:</span> 076401250000000</p>
+
+            
+        </div>
+        
+
+        <h3>Batch Control</h3>
+        <p><span class="label">Service Class Code:</span> 225</p>
+        <p><span class="label">Entry/Addenda Count:</span> 3</p>
+        <p><span class="label">Entry Hash:</span> 0022920375</p>
+        <p><span class="label">Total Debit Amount:</span> <span class="amount">$367700.00</span></p>
+        <p><span class="label">Total Credit Amount:</span> <span class="amount">$7.64</span></p>
+        <p><span class="label">Company Identification:</span> 0125120764</p>
+        <p><span class="label">Originating DFI:</span> </p>
+        <p><span class="label">Batch Number:</span> </p>
+    </div>
+    
+
+    <div class="section">
+        <h2>File Control</h2>
+        <p><span class="label">Batch Count:</span> 1</p>
+        <p><span class="label">Block Count:</span> 0</p>
+        <p><span class="label">Entry/Addenda Count:</span> 3</p>
+        <p><span class="label">Entry Hash:</span> 0022920375</p>
+        <p><span class="label">Total Debit Amount:</span> <span class="amount">$367700.00</span></p>
+        <p><span class="label">Total Credit Amount:</span> <span class="amount">$0.00</span></p>
+    </div>
+</body>
+</html>
