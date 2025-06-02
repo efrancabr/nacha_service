@@ -1,5 +1,5 @@
 Record Type,Priority Code,Immediate Destination,Immediate Origin,File Creation Date,File Creation Time,File ID Modifier,Record Size,Blocking Factor,Format Code,Destination Name,Origin Name,Reference Code
-1,01,076401251,0764012512,2001-01-01,1037,A,094,10,1,BANCO DO BRASIL,EMPRESA EXEMPLO,
+1,01,076401251,0764012512,2025-06-01,1937,A,094,10,1,BANCO DO BRASIL,EMPRESA EXEMPLO,"        "
 Record Type,Service Class Code,Company Name,Company Discretionary Data,Company Identification,Standard Entry Class,Company Entry Description,Company Descriptive Date,Settlement Date,Originator Status Code,Originating DFI
 5,225,EMPRESA EXEMPLO,PAGAMENTO SALARIO,0764012512,PPD,SALARIO,250601,,1,07640125
 Record Type,Transaction Code,Receiving DFI,Check Digit,DFI Account Number,Amount,Individual ID Number,Individual Name,Discretionary Data,Addenda Record Indicator,Trace Number
@@ -7,5 +7,5 @@ Record Type,Transaction Code,Receiving DFI,Check Digit,DFI Account Number,Amount
 7,05,PAGAMENTO REFERENTE AO MES DE MAIO 2023,0001,0000001
 6,22,07640125,1,234567890,98700,0,MARIA SANTOS,0,0,076401250000000
 6,22,07640125,1,345678901,145600,0,PEDRO SOUZA,0,0,076401250000000
-8,225,3,0022920375,36770000,764,0125120764,,
-9,1,0,3,0022920375,36770000,0
+8,225,4,0022920375,36770000,764,0125120764,,
+9,1,0,4,0022920375,36770000,0

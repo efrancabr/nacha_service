@@ -33,6 +33,11 @@ func NewValidator() *Validator {
 func (v *Validator) ValidateFile(file *models.NachaFile) []error {
 	var errors []error
 
+	// Check for nil file
+	if file == nil {
+		return []error{fmt.Errorf("file is nil")}
+	}
+
 	// Basic structure validation
 	if err := file.Validate(); err != nil {
 		errors = append(errors, err)
@@ -167,12 +172,22 @@ func (v *Validator) validateFileHeader(header *models.FileHeader) []error {
 		errors = append(errors, fmt.Errorf("priority code must be 01"))
 	}
 
-	// Validate other fields
+	// Validate immediate destination (should be 9 digits)
 	if header.ImmediateDestination == "" {
 		errors = append(errors, fmt.Errorf("immediate destination is required"))
+	} else if len(header.ImmediateDestination) != 9 {
+		errors = append(errors, fmt.Errorf("immediate destination must be 9 digits"))
+	} else if _, err := strconv.Atoi(header.ImmediateDestination); err != nil {
+		errors = append(errors, fmt.Errorf("immediate destination must be numeric"))
 	}
+
+	// Validate immediate origin (should be 10 digits)
 	if header.ImmediateOrigin == "" {
 		errors = append(errors, fmt.Errorf("immediate origin is required"))
+	} else if len(header.ImmediateOrigin) != 10 {
+		errors = append(errors, fmt.Errorf("immediate origin must be 10 digits"))
+	} else if _, err := strconv.Atoi(header.ImmediateOrigin); err != nil {
+		errors = append(errors, fmt.Errorf("immediate origin must be numeric"))
 	}
 
 	return errors
@@ -215,6 +230,17 @@ func (v *Validator) validateBatchHeader(header *models.BatchHeader) []error {
 		errors = append(errors, fmt.Errorf("invalid service class code"))
 	}
 
+	// Validate standard entry class
+	validSECs := map[string]bool{"PPD": true, "CCD": true, "CTX": true, "WEB": true, "TEL": true}
+	if !validSECs[header.StandardEntryClass] {
+		errors = append(errors, fmt.Errorf("invalid standard entry class"))
+	}
+
+	// Validate originator status code
+	if header.OriginatorStatusCode != "1" && header.OriginatorStatusCode != "2" {
+		errors = append(errors, fmt.Errorf("invalid originator status code"))
+	}
+
 	// Validate other fields
 	if header.CompanyName == "" {
 		errors = append(errors, fmt.Errorf("company name is required"))
@@ -244,10 +270,14 @@ func (v *Validator) validateEntryDetail(entry *models.EntryDetail, entryNum int)
 		errors = append(errors, fmt.Errorf("invalid transaction code"))
 	}
 
-	// Validate other fields
+	// Validate receiving DFI (should be 8 digits)
 	if entry.ReceivingDFI == "" {
 		errors = append(errors, fmt.Errorf("receiving DFI is required"))
+	} else if len(entry.ReceivingDFI) != 8 {
+		errors = append(errors, fmt.Errorf("receiving DFI must be 8 digits"))
 	}
+
+	// Validate other fields
 	if entry.DFIAccountNumber == "" {
 		errors = append(errors, fmt.Errorf("DFI account number is required"))
 	}
@@ -263,6 +293,16 @@ func (v *Validator) validateEntryDetail(entry *models.EntryDetail, entryNum int)
 
 func (v *Validator) validateBatchControl(control *models.BatchControl, batch *models.NachaBatch) []error {
 	var errors []error
+
+	// Validate record type
+	if control.RecordType != "8" {
+		errors = append(errors, fmt.Errorf("batch control record type must be 8"))
+	}
+
+	// Validate service class code matches header
+	if control.ServiceClassCode != batch.Header.ServiceClassCode {
+		errors = append(errors, fmt.Errorf("batch control service class code must match header"))
+	}
 
 	// Validate entry count
 	calculatedCount := len(batch.Entries)
@@ -281,11 +321,24 @@ func (v *Validator) validateBatchControl(control *models.BatchControl, batch *mo
 			calculatedHash, control.EntryHash))
 	}
 
+	// Validate amounts are not negative
+	if control.TotalDebitAmount < 0 {
+		errors = append(errors, fmt.Errorf("total debit amount cannot be negative"))
+	}
+	if control.TotalCreditAmount < 0 {
+		errors = append(errors, fmt.Errorf("total credit amount cannot be negative"))
+	}
+
 	return errors
 }
 
 func (v *Validator) validateFileControl(control *models.FileControl, file *models.NachaFile) []error {
 	var errors []error
+
+	// Validate record type
+	if control.RecordType != "9" {
+		errors = append(errors, fmt.Errorf("file control record type must be 9"))
+	}
 
 	// Validate batch count
 	if control.BatchCount != len(file.Batches) {
@@ -298,6 +351,17 @@ func (v *Validator) validateFileControl(control *models.FileControl, file *model
 	if control.EntryAddendaCount != calculatedCount {
 		errors = append(errors, fmt.Errorf("file control entry/addenda count mismatch: expected %d, got %d",
 			calculatedCount, control.EntryAddendaCount))
+	}
+
+	// Validate counts are not negative
+	if control.BatchCount < 0 {
+		errors = append(errors, fmt.Errorf("batch count cannot be negative"))
+	}
+	if control.BlockCount < 0 {
+		errors = append(errors, fmt.Errorf("block count cannot be negative"))
+	}
+	if control.EntryAddendaCount < 0 {
+		errors = append(errors, fmt.Errorf("entry/addenda count cannot be negative"))
 	}
 
 	return errors

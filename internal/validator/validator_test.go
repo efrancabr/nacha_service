@@ -167,18 +167,29 @@ func TestValidator_ValidateFile(t *testing.T) {
 
 	// Test case 14: Nil entries in batch
 	invalidFile = *file
+	// Create a deep copy of the batches slice
+	invalidFile.Batches = make([]models.Batch, len(file.Batches))
+	copy(invalidFile.Batches, file.Batches)
 	invalidFile.Batches[0].Entries = nil
 	errors = validator.ValidateFile(&invalidFile)
 	assert.NotEmpty(t, errors)
 
 	// Test case 15: Empty entries in batch
 	invalidFile = *file
+	// Create a deep copy of the batches slice
+	invalidFile.Batches = make([]models.Batch, len(file.Batches))
+	copy(invalidFile.Batches, file.Batches)
 	invalidFile.Batches[0].Entries = []models.EntryDetail{}
 	errors = validator.ValidateFile(&invalidFile)
 	assert.NotEmpty(t, errors)
 
 	// Test case 16: Nil addenda records
 	invalidFile = *file
+	// Create a deep copy of the entries slice to avoid sharing with previous test case
+	invalidFile.Batches = make([]models.Batch, len(file.Batches))
+	copy(invalidFile.Batches, file.Batches)
+	invalidFile.Batches[0].Entries = make([]models.EntryDetail, len(file.Batches[0].Entries))
+	copy(invalidFile.Batches[0].Entries, file.Batches[0].Entries)
 	invalidFile.Batches[0].Entries[0].AddendaRecords = nil
 	errors = validator.ValidateFile(&invalidFile)
 	assert.NotEmpty(t, errors)
@@ -220,15 +231,15 @@ func TestValidator_ValidateFileHeader(t *testing.T) {
 	errors = validator.validateFileHeader(&invalidHeader)
 	assert.NotEmpty(t, errors)
 
-	// Test case 4: Invalid immediate destination
+	// Test case 4: Invalid immediate destination (should be numeric)
 	invalidHeader = header
-	invalidHeader.ImmediateDestination = "999999999"
+	invalidHeader.ImmediateDestination = "ABCDEFGHI"
 	errors = validator.validateFileHeader(&invalidHeader)
 	assert.NotEmpty(t, errors)
 
-	// Test case 5: Invalid immediate origin
+	// Test case 5: Invalid immediate origin (should be numeric)
 	invalidHeader = header
-	invalidHeader.ImmediateOrigin = "999999999"
+	invalidHeader.ImmediateOrigin = "ABCDEFGHIJ"
 	errors = validator.validateFileHeader(&invalidHeader)
 	assert.NotEmpty(t, errors)
 }
@@ -363,8 +374,8 @@ func TestValidator_ValidateBatchControl(t *testing.T) {
 	control := models.BatchControl{
 		RecordType:            "8",
 		ServiceClassCode:      "225",
-		EntryAddendaCount:     2,
-		EntryHash:             "0764012500",
+		EntryAddendaCount:     1,
+		EntryHash:             "0007640125",
 		TotalDebitAmount:      123400,
 		TotalCreditAmount:     0,
 		CompanyIdentification: "0764012512",

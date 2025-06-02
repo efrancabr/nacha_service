@@ -89,9 +89,9 @@ INSERT INTO file_header (
     destination_name, origin_name, reference_code
 ) VALUES (
     '01', '076401251', '0764012512',
-    '2001-01-01', '1037', 'A',
+    '2025-06-01', '1937', 'A',
     '094', '10', '1',
-    'BANCO DO BRASIL', 'EMPRESA EXEMPLO', ''
+    'BANCO DO BRASIL', 'EMPRESA EXEMPLO', '        '
 );
 
 -- Insert batch 1 header
@@ -182,10 +182,10 @@ INSERT INTO batch_control (
 ) VALUES (
     (SELECT id FROM batch_header ORDER BY id DESC LIMIT 1),
     '225',
-    3, '0022920375',
+    4, '0022920375',
     36770000, 764,
     '0125120764', '',
-    %!d(string=)
+    ''
 );
 
 -- Insert file control
@@ -196,6 +196,6 @@ INSERT INTO file_control (
 ) VALUES (
     (SELECT id FROM file_header ORDER BY id DESC LIMIT 1),
     1, 0,
-    3, '0022920375',
+    4, '0022920375',
     36770000, 0
 );

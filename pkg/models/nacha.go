@@ -474,6 +474,9 @@ func formatBatchHeader(h *BatchHeader) string {
 	buf.WriteString(padRight(h.SettlementDate, 3))
 	buf.WriteString(padRight(h.OriginatorStatusCode, 1))
 	buf.WriteString(padRight(h.OriginatingDFI, 8))
+	// Convert batch number to int and format with leading zeros
+	batchNum, _ := strconv.Atoi(h.BatchNumber)
+	buf.WriteString(formatNumber(int64(batchNum), 7))
 	return buf.String()
 }
 
@@ -513,7 +516,9 @@ func formatBatchControl(c *BatchControl) string {
 	buf.WriteString(formatAmount(c.TotalCreditAmount))
 	buf.WriteString(padRight(c.CompanyIdentification, 10))
 	buf.WriteString(padRight(c.OriginatingDFI, 8))
-	buf.WriteString(padRight(c.BatchNumber, 7))
+	// Convert batch number to int and format with leading zeros
+	batchNum, _ := strconv.Atoi(c.BatchNumber)
+	buf.WriteString(formatNumber(int64(batchNum), 7))
 	return buf.String()
 }
 
@@ -552,7 +557,7 @@ func parseFileHeader(line string) FileHeader {
 		FormatCode:           strings.TrimSpace(line[39:40]),
 		DestinationName:      strings.TrimSpace(line[40:63]),
 		OriginName:           strings.TrimSpace(line[63:86]),
-		ReferenceCode:        strings.TrimSpace(line[86:94]),
+		ReferenceCode:        line[86:94],
 	}
 }
 
@@ -563,7 +568,7 @@ func parseBatchHeader(line string) BatchHeader {
 	}
 	return BatchHeader{
 		RecordType:               "5",
-		ServiceClassCode:         "225",
+		ServiceClassCode:         strings.TrimSpace(line[1:4]),
 		CompanyName:              strings.TrimSpace(line[4:20]),
 		CompanyDiscretionaryData: strings.TrimSpace(line[20:40]),
 		CompanyIdentification:    strings.TrimSpace(line[40:50]),
@@ -573,7 +578,7 @@ func parseBatchHeader(line string) BatchHeader {
 		SettlementDate:           strings.TrimSpace(line[69:72]),
 		OriginatorStatusCode:     strings.TrimSpace(line[72:73]),
 		OriginatingDFI:           strings.TrimSpace(line[73:81]),
-		BatchNumber:              strings.TrimSpace(line[87:94]),
+		BatchNumber:              strings.TrimSpace(line[81:88]), // Correct position for batch number
 	}
 }
 
@@ -585,7 +590,7 @@ func parseEntryDetail(line string) *EntryDetail {
 	amount, _ := strconv.ParseInt(strings.TrimSpace(line[29:39]), 10, 64)
 	return &EntryDetail{
 		RecordType:             "6",
-		TransactionCode:        "22",
+		TransactionCode:        strings.TrimSpace(line[1:3]),
 		ReceivingDFI:           strings.TrimSpace(line[3:11]),
 		CheckDigit:             strings.TrimSpace(line[11:12]),
 		DFIAccountNumber:       strings.TrimSpace(line[12:29]),
@@ -619,10 +624,10 @@ func parseBatchControl(line string) BatchControl {
 	entryAddendaCount, _ := strconv.Atoi(strings.TrimSpace(line[4:10]))
 	totalDebit, _ := strconv.ParseInt(strings.TrimSpace(line[20:32]), 10, 64)
 	totalCredit, _ := strconv.ParseInt(strings.TrimSpace(line[32:44]), 10, 64)
-	batchNumber := strings.TrimSpace(line[87:94])
+	batchNumber := strings.TrimSpace(line[87:94]) // Correct position for batch control
 	return BatchControl{
 		RecordType:            "8",
-		ServiceClassCode:      "225",
+		ServiceClassCode:      strings.TrimSpace(line[1:4]),
 		EntryAddendaCount:     entryAddendaCount,
 		EntryHash:             strings.TrimSpace(line[10:20]),
 		TotalDebitAmount:      totalDebit,

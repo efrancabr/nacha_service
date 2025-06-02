@@ -1,23 +1,23 @@
 {
   "Header": {
-    "RecordType": "",
+    "RecordType": "1",
     "PriorityCode": "01",
     "ImmediateDestination": "076401251",
     "ImmediateOrigin": "0764012512",
-    "FileCreationDate": "2001-01-01T00:00:00Z",
-    "FileCreationTime": "1037",
+    "FileCreationDate": "2025-06-01T00:00:00Z",
+    "FileCreationTime": "1937",
     "FileIDModifier": "A",
     "RecordSize": "094",
     "BlockingFactor": "10",
     "FormatCode": "1",
     "DestinationName": "BANCO DO BRASIL",
     "OriginName": "EMPRESA EXEMPLO",
-    "ReferenceCode": ""
+    "ReferenceCode": "        "
   },
   "Batches": [
     {
       "Header": {
-        "RecordType": "",
+        "RecordType": "5",
         "ServiceClassCode": "225",
         "CompanyName": "EMPRESA EXEMPLO",
         "CompanyDiscretionaryData": "PAGAMENTO SALARIO",
@@ -28,10 +28,11 @@
         "SettlementDate": "",
         "OriginatorStatusCode": "1",
         "OriginatingDFI": "07640125",
-        "BatchNumber": ""
+        "BatchNumber": "0000001"
       },
       "Entries": [
         {
+          "RecordType": "6",
           "TransactionCode": "22",
           "ReceivingDFI": "07640125",
           "CheckDigit": "1",
@@ -52,6 +53,7 @@
           ]
         },
         {
+          "RecordType": "6",
           "TransactionCode": "22",
           "ReceivingDFI": "07640125",
           "CheckDigit": "1",
@@ -65,6 +67,7 @@
           "AddendaRecords": null
         },
         {
+          "RecordType": "6",
           "TransactionCode": "22",
           "ReceivingDFI": "07640125",
           "CheckDigit": "1",
@@ -79,9 +82,9 @@
         }
       ],
       "Control": {
-        "RecordType": "",
+        "RecordType": "8",
         "ServiceClassCode": "225",
-        "EntryAddendaCount": 3,
+        "EntryAddendaCount": 4,
         "EntryHash": "0022920375",
         "TotalDebitAmount": 36770000,
         "TotalCreditAmount": 764,
@@ -94,10 +97,10 @@
     }
   ],
   "Control": {
-    "RecordType": "",
+    "RecordType": "9",
     "BatchCount": 1,
     "BlockCount": 0,
-    "EntryAddendaCount": 3,
+    "EntryAddendaCount": 4,
     "EntryHash": "0022920375",
     "TotalDebitAmount": 36770000,
     "TotalCreditAmount": 0,

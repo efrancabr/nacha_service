@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	pb "github.com/yourusername/nacha-service/gen/nacha/v1"
+	pb "github.com/nacha-service/api/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
@@ -96,10 +96,13 @@ func exportToAllFormats(ctx context.Context, client pb.NachaServiceClient, fileC
 		formatName string
 		outputFile string
 	}{
-		{pb.ExportFormat_ACH_RAW, "ACH_RAW", "nacha_file.ach"},
 		{pb.ExportFormat_JSON, "JSON", "nacha_file.json"},
-		{pb.ExportFormat_JSON_PRETTY, "JSON_PRETTY", "nacha_file_pretty.json"},
-		{pb.ExportFormat_TEXT, "TEXT", "nacha_file.txt"},
+		{pb.ExportFormat_CSV, "CSV", "nacha_file.csv"},
+		{pb.ExportFormat_TXT, "TXT", "nacha_file.txt"},
+		{pb.ExportFormat_HTML, "HTML", "nacha_file.html"},
+		{pb.ExportFormat_PDF, "PDF", "nacha_file.pdf"},
+		{pb.ExportFormat_SQL, "SQL", "nacha_file.sql"},
+		{pb.ExportFormat_PARQUET, "PARQUET", "nacha_file.parquet"},
 	}
 
 	fmt.Println("\n=== Starting File Export Process ===")
@@ -112,9 +115,9 @@ func exportToAllFormats(ctx context.Context, client pb.NachaServiceClient, fileC
 	for _, f := range formats {
 		fmt.Printf("Exporting to %s format...\n", f.formatName)
 
-		resp, err := client.ExportFile(ctx, &pb.ExportFileRequest{
-			FileId: "test-file",
-			Format: f.format,
+		resp, err := client.ExportFile(ctx, &pb.ExportRequest{
+			FileContent: fileContent,
+			Format:      f.format,
 		})
 
 		if err != nil {
