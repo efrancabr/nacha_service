@@ -319,7 +319,7 @@ func TestViewDetails(t *testing.T) {
 	viewReq = &pb.DetailRequest{
 		FileContent: createResp.FileContent,
 		DetailType:  "entry",
-		Identifier:  "0764012500000001",
+		Identifier:  "076401250000000",
 	}
 
 	viewResp, err = service.ViewDetails(ctx, viewReq)

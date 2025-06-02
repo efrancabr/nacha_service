@@ -2,8 +2,8 @@
 Priority Code: 01
 Immediate Destination: 076401251
 Immediate Origin: 0764012512
-File Creation Date: 2025-06-01
-File Creation Time: 1937
+File Creation Date: 2025-06-02
+File Creation Time: 1947
 File ID Modifier: A
 Record Size: 094
 Blocking Factor: 10
@@ -20,7 +20,7 @@ Company Discretionary Data: PAGAMENTO SALARIO
 Company Identification: 0764012512
 Standard Entry Class: PPD
 Company Entry Description: SALARIO
-Company Descriptive Date: 250601
+Company Descriptive Date: 250602
 Settlement Date: 
 Originator Status Code: 1
 Originating DFI: 07640125

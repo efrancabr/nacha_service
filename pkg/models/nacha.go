@@ -588,6 +588,13 @@ func parseEntryDetail(line string) *EntryDetail {
 		line = line + strings.Repeat(" ", 94-len(line))
 	}
 	amount, _ := strconv.ParseInt(strings.TrimSpace(line[29:39]), 10, 64)
+
+	// Extract TraceNumber (positions 79-94, 15 characters for NACHA format)
+	traceNumber := ""
+	if len(line) >= 94 {
+		traceNumber = strings.TrimSpace(line[79:94])
+	}
+
 	return &EntryDetail{
 		RecordType:             "6",
 		TransactionCode:        strings.TrimSpace(line[1:3]),
@@ -599,7 +606,7 @@ func parseEntryDetail(line string) *EntryDetail {
 		IndividualName:         strings.TrimSpace(line[54:76]),
 		DiscretionaryData:      strings.TrimSpace(line[76:78]),
 		AddendaRecordIndicator: strings.TrimSpace(line[78:79]),
-		TraceNumber:            strings.TrimSpace(line[79:94]),
+		TraceNumber:            traceNumber,
 	}
 }
 
@@ -622,9 +629,9 @@ func parseBatchControl(line string) BatchControl {
 		line = line + strings.Repeat(" ", 94-len(line))
 	}
 	entryAddendaCount, _ := strconv.Atoi(strings.TrimSpace(line[4:10]))
-	totalDebit, _ := strconv.ParseInt(strings.TrimSpace(line[20:32]), 10, 64)
-	totalCredit, _ := strconv.ParseInt(strings.TrimSpace(line[32:44]), 10, 64)
-	batchNumber := strings.TrimSpace(line[87:94]) // Correct position for batch control
+	totalDebit, _ := strconv.ParseInt(strings.TrimSpace(line[20:30]), 10, 64)
+	totalCredit, _ := strconv.ParseInt(strings.TrimSpace(line[30:40]), 10, 64)
+	batchNumber := strings.TrimSpace(line[87:94])
 	return BatchControl{
 		RecordType:            "8",
 		ServiceClassCode:      strings.TrimSpace(line[1:4]),
@@ -632,7 +639,7 @@ func parseBatchControl(line string) BatchControl {
 		EntryHash:             strings.TrimSpace(line[10:20]),
 		TotalDebitAmount:      totalDebit,
 		TotalCreditAmount:     totalCredit,
-		CompanyIdentification: strings.TrimSpace(line[44:54]),
+		CompanyIdentification: strings.TrimSpace(line[40:50]),
 		OriginatingDFI:        strings.TrimSpace(line[79:87]),
 		BatchNumber:           batchNumber,
 	}
@@ -646,8 +653,8 @@ func parseFileControl(line string) FileControl {
 	batchCount, _ := strconv.Atoi(strings.TrimSpace(line[1:7]))
 	blockCount, _ := strconv.Atoi(strings.TrimSpace(line[7:13]))
 	entryAddendaCount, _ := strconv.Atoi(strings.TrimSpace(line[13:21]))
-	totalDebit, _ := strconv.ParseInt(strings.TrimSpace(line[31:43]), 10, 64)
-	totalCredit, _ := strconv.ParseInt(strings.TrimSpace(line[43:55]), 10, 64)
+	totalDebit, _ := strconv.ParseInt(strings.TrimSpace(line[31:41]), 10, 64)
+	totalCredit, _ := strconv.ParseInt(strings.TrimSpace(line[41:51]), 10, 64)
 	return FileControl{
 		RecordType:        "9",
 		BatchCount:        batchCount,
@@ -676,6 +683,15 @@ func formatNumber(n int64, width int) string {
 }
 
 func formatTraceNumber(base string, batchNum, entryNum int) string {
+	// If the base is longer than 15 characters, truncate it
+	if len(base) >= 15 {
+		return base[:15]
+	}
+	// If the base is 8 characters (routing number), add entry number
+	if len(base) == 8 {
+		return fmt.Sprintf("%s%07d", base, entryNum)
+	}
+	// Otherwise, format with entry number
 	return fmt.Sprintf("%s%07d", base, entryNum)
 }
 

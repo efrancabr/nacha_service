@@ -89,7 +89,7 @@ INSERT INTO file_header (
     destination_name, origin_name, reference_code
 ) VALUES (
     '01', '076401251', '0764012512',
-    '2025-06-01', '1937', 'A',
+    '2025-06-02', '1947', 'A',
     '094', '10', '1',
     'BANCO DO BRASIL', 'EMPRESA EXEMPLO', '        '
 );
@@ -106,7 +106,7 @@ INSERT INTO batch_header (
     '225', 'EMPRESA EXEMPLO',
     'PAGAMENTO SALARIO', '0764012512',
     'PPD', 'SALARIO',
-    '250601', '',
+    '250602', '',
     '1', '07640125'
 );
 
