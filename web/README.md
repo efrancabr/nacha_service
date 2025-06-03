@@ -143,10 +143,10 @@ export GRPC_SERVER=localhost:50051
 - **Mobile**: < 768px - Layout vertical
 
 ### Recursos Mobile
-- Touch-friendly buttons
-- Swipe gestures
-- Optimized forms
-- Compressed images
+- Botões adaptados para toque
+- Gestos de deslize
+- Formulários otimizados
+- Imagens comprimidas
 
 ## 🔒 Segurança
 
@@ -217,7 +217,7 @@ window.addEventListener('load', function() {
 1. Fork o repositório
 2. Crie uma branch para sua feature
 3. Implemente as mudanças
-4. Teste thoroughly
+4. Teste completamente
 5. Submeta um Pull Request
 
 ### Padrões de Código
