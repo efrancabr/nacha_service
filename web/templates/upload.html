@@ -1,0 +1,102 @@
+{{define "content"}}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">📤 Upload NACHA File</h1>
+        <p class="card-subtitle">Upload an existing NACHA file for validation and processing</p>
+    </div>
+
+    <form method="POST" action="/upload" enctype="multipart/form-data">
+        <div class="file-upload">
+            <div class="file-upload-icon">📁</div>
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Choose NACHA File</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Select a .txt or .ach file to upload and process
+            </p>
+            <input type="file" name="nacha_file" accept=".txt,.ach" required 
+                   style="margin-bottom: 1rem;" id="file-input">
+        </div>
+
+        <div class="form-group" style="margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary">
+                <span>📤</span>
+                Upload and Process
+            </button>
+            <a href="/" class="btn btn-outline" style="margin-left: 1rem;">
+                <span>↩️</span>
+                Back to Home
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📋 File Requirements</h2>
+    </div>
+
+    <div class="grid grid-cols-2">
+        <div>
+            <h3 class="feature-title">📁 Supported Formats</h3>
+            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>.txt</strong> - Standard text files</li>
+                <li><strong>.ach</strong> - ACH format files</li>
+                <li>Fixed-width 94-character records</li>
+                <li>Standard NACHA formatting</li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="feature-title">✅ Validation Checks</h3>
+            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Record length validation</li>
+                <li>Field format validation</li>
+                <li>Amount calculations</li>
+                <li>Control totals verification</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">🔄 Processing Flow</h2>
+    </div>
+
+    <div class="grid grid-cols-3">
+        <div class="feature-card" style="cursor: default; transform: none;">
+            <span class="feature-icon">1️⃣</span>
+            <h3 class="feature-title">Upload</h3>
+            <p class="feature-desc">File is uploaded and parsed</p>
+        </div>
+
+        <div class="feature-card" style="cursor: default; transform: none;">
+            <span class="feature-icon">2️⃣</span>
+            <h3 class="feature-title">Validate</h3>
+            <p class="feature-desc">Automatic validation against NACHA rules</p>
+        </div>
+
+        <div class="feature-card" style="cursor: default; transform: none;">
+            <span class="feature-icon">3️⃣</span>
+            <h3 class="feature-title">Results</h3>
+            <p class="feature-desc">View validation results and options</p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('file-input').addEventListener('change', function(e) {
+    const fileName = e.target.files[0]?.name;
+    if (fileName) {
+        const uploadArea = document.querySelector('.file-upload');
+        uploadArea.style.borderColor = 'var(--success-color)';
+        uploadArea.style.background = 'rgba(16, 185, 129, 0.05)';
+        
+        const icon = document.querySelector('.file-upload-icon');
+        icon.textContent = '✅';
+        
+        const text = uploadArea.querySelector('h3');
+        text.textContent = `Selected: ${fileName}`;
+    }
+});
+</script>
+{{end}} 

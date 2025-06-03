@@ -1,0 +1,107 @@
+{{define "content"}}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">📝 Create NACHA File</h1>
+        <p class="card-subtitle">Generate a new NACHA file with batch headers and entry details</p>
+    </div>
+
+    <form method="POST" action="/create">
+        <div class="grid grid-cols-2">
+            <div class="form-group">
+                <label for="immediate_destination" class="form-label">Immediate Destination</label>
+                <input type="text" id="immediate_destination" name="immediate_destination" 
+                       class="form-input" placeholder="123456789" maxlength="9" required>
+                <small style="color: var(--text-secondary);">9-digit routing number of receiving bank</small>
+            </div>
+
+            <div class="form-group">
+                <label for="immediate_origin" class="form-label">Immediate Origin</label>
+                <input type="text" id="immediate_origin" name="immediate_origin" 
+                       class="form-input" placeholder="987654321" maxlength="9" required>
+                <small style="color: var(--text-secondary);">9-digit routing number of originating bank</small>
+            </div>
+
+            <div class="form-group">
+                <label for="company_name" class="form-label">Company Name</label>
+                <input type="text" id="company_name" name="company_name" 
+                       class="form-input" placeholder="TEST COMPANY" maxlength="16" required>
+                <small style="color: var(--text-secondary);">Name of the company originating the ACH</small>
+            </div>
+
+            <div class="form-group">
+                <label for="company_id" class="form-label">Company ID</label>
+                <input type="text" id="company_id" name="company_id" 
+                       class="form-input" placeholder="1234567890" maxlength="10" required>
+                <small style="color: var(--text-secondary);">Company identification number</small>
+            </div>
+
+            <div class="form-group">
+                <label for="amount" class="form-label">Amount (in cents)</label>
+                <input type="number" id="amount" name="amount" 
+                       class="form-input" placeholder="123400" min="1" required>
+                <small style="color: var(--text-secondary);">Amount in cents (e.g., 123400 = $1,234.00)</small>
+            </div>
+
+            <div class="form-group">
+                <label for="receiving_dfi" class="form-label">Receiving DFI</label>
+                <input type="text" id="receiving_dfi" name="receiving_dfi" 
+                       class="form-input" placeholder="12345678" maxlength="8" required>
+                <small style="color: var(--text-secondary);">8-digit routing number of receiving bank</small>
+            </div>
+
+            <div class="form-group">
+                <label for="account_number" class="form-label">Account Number</label>
+                <input type="text" id="account_number" name="account_number" 
+                       class="form-input" placeholder="123456789" maxlength="17" required>
+                <small style="color: var(--text-secondary);">Recipient's account number</small>
+            </div>
+
+            <div class="form-group">
+                <label for="individual_name" class="form-label">Individual Name</label>
+                <input type="text" id="individual_name" name="individual_name" 
+                       class="form-input" placeholder="JOHN DOE" maxlength="22" required>
+                <small style="color: var(--text-secondary);">Name of the account holder</small>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary">
+                <span>📝</span>
+                Create NACHA File
+            </button>
+            <a href="/" class="btn btn-outline" style="margin-left: 1rem;">
+                <span>↩️</span>
+                Back to Home
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">💡 Tips for Creating NACHA Files</h2>
+    </div>
+
+    <div class="grid grid-cols-2">
+        <div>
+            <h3 class="feature-title">🏦 Routing Numbers</h3>
+            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Must be exactly 9 digits</li>
+                <li>Use valid ABA routing numbers</li>
+                <li>Destination: receiving bank</li>
+                <li>Origin: your bank</li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="feature-title">💰 Amount Format</h3>
+            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Enter amounts in cents</li>
+                <li>$1.00 = 100 cents</li>
+                <li>$1,234.56 = 123456 cents</li>
+                <li>No decimal points needed</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{{end}} 

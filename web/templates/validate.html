@@ -1,0 +1,98 @@
+{{define "content"}}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">✅ Validate NACHA File</h1>
+        <p class="card-subtitle">Validate NACHA files against official standards and rules</p>
+    </div>
+
+    <form method="POST" action="/validate">
+        <div class="form-group">
+            <label for="file_content" class="form-label">NACHA File Content</label>
+            <textarea id="file_content" name="file_content" class="form-textarea" 
+                      placeholder="Paste your NACHA file content here or upload a file above..."
+                      style="min-height: 200px;" required></textarea>
+            <small style="color: var(--text-secondary);">
+                Paste the complete NACHA file content including all headers, batches, and controls
+            </small>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">
+                <span>✅</span>
+                Validate File
+            </button>
+            <a href="/" class="btn btn-outline" style="margin-left: 1rem;">
+                <span>↩️</span>
+                Back to Home
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">🔍 Validation Rules</h2>
+    </div>
+
+    <div class="grid grid-cols-2">
+        <div>
+            <h3 class="feature-title">📏 Format Validation</h3>
+            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>94-character record length</li>
+                <li>Proper record type codes</li>
+                <li>Field positioning and alignment</li>
+                <li>Numeric field validation</li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="feature-title">🧮 Business Rules</h3>
+            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Control total calculations</li>
+                <li>Entry hash validation</li>
+                <li>Batch balance verification</li>
+                <li>File control totals</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📝 Sample NACHA File Structure</h2>
+    </div>
+
+    <div class="code-block">
+        <pre>101 123456789 987654321241205160BA94101RECEIVING BANK        ORIGINATING BANK       
+5220TEST COMPANY                        1234567890PPDPAYROLL   241205   1987654320000001
+622012345678 123456789        0000123400               JOHN DOE                0987654320000001
+822000000100012345678000001234000000000000000123456789               987654320000001
+9000001000001000000010012345678000001234000000000000000123456789                         </pre>
+    </div>
+
+    <div style="margin-top: 1rem;">
+        <div class="badge badge-info">File Header (101)</div>
+        <div class="badge badge-success" style="margin-left: 0.5rem;">Batch Header (5220)</div>
+        <div class="badge badge-warning" style="margin-left: 0.5rem;">Entry Detail (622)</div>
+        <div class="badge badge-success" style="margin-left: 0.5rem;">Batch Control (8220)</div>
+        <div class="badge badge-info" style="margin-left: 0.5rem;">File Control (9)</div>
+    </div>
+</div>
+
+<script>
+// Auto-format textarea for better readability
+document.getElementById('file_content').addEventListener('input', function(e) {
+    const content = e.target.value;
+    const lines = content.split('\n');
+    
+    // Basic validation feedback
+    if (lines.length > 0 && lines[0].startsWith('101')) {
+        e.target.style.borderColor = 'var(--success-color)';
+    } else if (content.trim()) {
+        e.target.style.borderColor = 'var(--warning-color)';
+    } else {
+        e.target.style.borderColor = 'var(--border-color)';
+    }
+});
+</script>
+{{end}} 

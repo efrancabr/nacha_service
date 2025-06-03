@@ -1,0 +1,90 @@
+{{define "content"}}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">✅ {{.Title}}</h1>
+        <p class="card-subtitle">{{.Message}}</p>
+    </div>
+
+    <div class="message message-success">
+        <strong>🎉 Success!</strong> Your NACHA file has been created successfully and is ready for use.
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">📄 Generated File Content</h2>
+        </div>
+
+        <div class="code-block">
+            <pre>{{.Data}}</pre>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-3" style="margin-top: 2rem;">
+        <a href="/validate?content={{.Data}}" class="btn btn-primary">
+            <span>✅</span>
+            Validate File
+        </a>
+        
+        <a href="/view?content={{.Data}}" class="btn btn-success">
+            <span>👁️</span>
+            View Content
+        </a>
+        
+        <a href="/export?content={{.Data}}" class="btn btn-secondary">
+            <span>💾</span>
+            Export File
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📋 Next Steps</h2>
+    </div>
+
+    <div class="grid grid-cols-3">
+        <div class="feature-card">
+            <span class="feature-icon">✅</span>
+            <h3 class="feature-title">Validate</h3>
+            <p class="feature-desc">Ensure the file meets all NACHA standards and requirements</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="feature-icon">👁️</span>
+            <h3 class="feature-title">Review</h3>
+            <p class="feature-desc">Examine the file structure and verify transaction details</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="feature-icon">💾</span>
+            <h3 class="feature-title">Export</h3>
+            <p class="feature-desc">Download in your preferred format for processing</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📊 File Information</h2>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">1</div>
+            <div class="stat-label">Batch Created</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">1</div>
+            <div class="stat-label">Entry Detail</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">5</div>
+            <div class="stat-label">Total Records</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">94</div>
+            <div class="stat-label">Char/Record</div>
+        </div>
+    </div>
+</div>
+{{end}} 

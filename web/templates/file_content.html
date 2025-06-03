@@ -1,0 +1,121 @@
+{{define "content"}}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">👁️ NACHA File Content</h1>
+        <p class="card-subtitle">Detailed view of file structure, batches, and statistics</p>
+    </div>
+</div>
+
+<!-- File Header -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📄 File Header Information</h2>
+    </div>
+
+    <div class="table-container">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td><strong>Immediate Destination</strong></td>
+                    <td>{{index .Data.Header "immediate_destination"}}</td>
+                </tr>
+                <tr>
+                    <td><strong>Immediate Origin</strong></td>
+                    <td>{{index .Data.Header "immediate_origin"}}</td>
+                </tr>
+                <tr>
+                    <td><strong>File Creation Date</strong></td>
+                    <td>{{index .Data.Header "file_creation_date"}}</td>
+                </tr>
+                <tr>
+                    <td><strong>File Creation Time</strong></td>
+                    <td>{{index .Data.Header "file_creation_time"}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- File Statistics -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📊 File Statistics</h2>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{index .Data.Statistics "total_batches"}}</div>
+            <div class="stat-label">Total Batches</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{index .Data.Statistics "total_entries"}}</div>
+            <div class="stat-label">Total Entries</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">${{printf "%.2f" (div (index .Data.Statistics "total_amount") 100.0)}}</div>
+            <div class="stat-label">Total Amount</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{len .Data.Batches}}</div>
+            <div class="stat-label">Batch Count</div>
+        </div>
+    </div>
+</div>
+
+<!-- Batch Information -->
+{{range $i, $batch := .Data.Batches}}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📦 Batch {{add $i 1}} Details</h2>
+    </div>
+
+    <div class="table-container">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td><strong>Service Class Code</strong></td>
+                    <td>
+                        {{index $batch "service_class_code"}}
+                        <span class="badge badge-info">
+                            {{if eq (index $batch "service_class_code") "220"}}Credits Only
+                            {{else if eq (index $batch "service_class_code") "225"}}Debits Only  
+                            {{else if eq (index $batch "service_class_code") "200"}}Mixed
+                            {{else}}Unknown{{end}}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Company Name</strong></td>
+                    <td>{{index $batch "company_name"}}</td>
+                </tr>
+                <tr>
+                    <td><strong>Entry Count</strong></td>
+                    <td>{{index $batch "entry_count"}}</td>
+                </tr>
+                <tr>
+                    <td><strong>Entry Hash</strong></td>
+                    <td>{{index $batch "entry_hash"}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{{end}}
+
+<div class="grid grid-cols-3" style="margin-top: 2rem;">
+    <a href="/view" class="btn btn-primary">
+        <span>🔄</span>
+        View Another File
+    </a>
+    
+    <a href="/export" class="btn btn-success">
+        <span>💾</span>
+        Export This File
+    </a>
+    
+    <a href="/details" class="btn btn-secondary">
+        <span>🔍</span>
+        Transaction Details
+    </a>
+</div>
+{{end}} 

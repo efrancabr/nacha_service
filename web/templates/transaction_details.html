@@ -1,0 +1,156 @@
+{{define "content"}}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">🔍 Transaction Details</h1>
+        <p class="card-subtitle">Detailed information for trace number: {{index .Data "trace_number"}}</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">💰 Transaction Information</h2>
+    </div>
+
+    <div class="table-container">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td><strong>Trace Number</strong></td>
+                    <td>
+                        <code>{{index .Data "trace_number"}}</code>
+                        <span class="badge badge-info">Unique ID</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Transaction Code</strong></td>
+                    <td>
+                        {{index .Data "transaction_code"}}
+                        <span class="badge badge-success">
+                            {{if eq (index .Data "transaction_code") "22"}}Credit
+                            {{else if eq (index .Data "transaction_code") "27"}}Debit
+                            {{else}}Other{{end}}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Amount</strong></td>
+                    <td>
+                        <span style="font-size: 1.2rem; font-weight: 600; color: var(--success-color);">
+                            ${{printf "%.2f" (div (index .Data "amount") 100.0)}}
+                        </span>
+                        <small style="color: var(--text-secondary);">({{index .Data "amount"}} cents)</small>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Individual Name</strong></td>
+                    <td>{{index .Data "individual_name"}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">🏦 Banking Information</h2>
+    </div>
+
+    <div class="table-container">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td><strong>Receiving DFI</strong></td>
+                    <td>
+                        <code>{{index .Data "receiving_dfi"}}</code>
+                        <small style="color: var(--text-secondary);">Routing Number</small>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Account Number</strong></td>
+                    <td>
+                        <code>{{index .Data "account_number"}}</code>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Check Digit</strong></td>
+                    <td>{{index .Data "check_digit"}}</td>
+                </tr>
+                <tr>
+                    <td><strong>Individual ID</strong></td>
+                    <td>{{index .Data "individual_id_number"}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📊 Transaction Summary</h2>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{index .Data "transaction_code"}}</div>
+            <div class="stat-label">Transaction Code</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">${{printf "%.2f" (div (index .Data "amount") 100.0)}}</div>
+            <div class="stat-label">Amount</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{index .Data "receiving_dfi"}}</div>
+            <div class="stat-label">Receiving DFI</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">15</div>
+            <div class="stat-label">Trace Number Length</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">🔍 Transaction Code Reference</h2>
+    </div>
+
+    <div class="grid grid-cols-2">
+        <div>
+            <h3 class="feature-title">💰 Credit Codes</h3>
+            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>22</strong> - Automated Deposit</li>
+                <li><strong>23</strong> - Preauthorized Credit</li>
+                <li><strong>24</strong> - Zero Dollar with Remittance</li>
+                <li><strong>32</strong> - Automated Deposit (Savings)</li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="feature-title">💸 Debit Codes</h3>
+            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>27</strong> - Automated Payment</li>
+                <li><strong>28</strong> - Preauthorized Debit</li>
+                <li><strong>29</strong> - Corporate Debit</li>
+                <li><strong>37</strong> - Automated Payment (Savings)</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-3" style="margin-top: 2rem;">
+    <a href="/details" class="btn btn-primary">
+        <span>🔍</span>
+        Lookup Another
+    </a>
+    
+    <a href="/view" class="btn btn-success">
+        <span>👁️</span>
+        View Full File
+    </a>
+    
+    <a href="/export" class="btn btn-secondary">
+        <span>💾</span>
+        Export Data
+    </a>
+</div>
+{{end}} 

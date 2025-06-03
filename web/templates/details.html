@@ -1,0 +1,130 @@
+{{define "content"}}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">🔍 Transaction Details</h1>
+        <p class="card-subtitle">Look up specific transaction details by trace number</p>
+    </div>
+
+    <form method="GET" action="/details">
+        <div class="grid grid-cols-2">
+            <div class="form-group">
+                <label for="content" class="form-label">NACHA File Content</label>
+                <textarea id="content" name="content" class="form-textarea" 
+                          placeholder="Paste your NACHA file content here..."
+                          style="min-height: 150px;" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="trace_number" class="form-label">Trace Number</label>
+                <input type="text" id="trace_number" name="trace_number" 
+                       class="form-input" placeholder="076401250000000" maxlength="15" required>
+                <small style="color: var(--text-secondary);">
+                    Enter the 15-character trace number to lookup
+                </small>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">
+                <span>🔍</span>
+                Find Transaction
+            </button>
+            <a href="/" class="btn btn-outline" style="margin-left: 1rem;">
+                <span>↩️</span>
+                Back to Home
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📋 About Trace Numbers</h2>
+    </div>
+
+    <div class="grid grid-cols-2">
+        <div>
+            <h3 class="feature-title">🔢 Format</h3>
+            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>15 characters total</li>
+                <li>First 8 digits: Originating DFI routing number</li>
+                <li>Last 7 digits: Sequential entry number</li>
+                <li>Example: 076401250000001</li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="feature-title">🎯 Purpose</h3>
+            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Unique transaction identifier</li>
+                <li>Track specific entries</li>
+                <li>Audit and reconciliation</li>
+                <li>Error resolution</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">🔍 What You'll Find</h2>
+    </div>
+
+    <div class="grid grid-cols-3">
+        <div class="feature-card" style="cursor: default; transform: none;">
+            <span class="feature-icon">💰</span>
+            <h3 class="feature-title">Transaction Data</h3>
+            <p class="feature-desc">Amount, transaction code, and account information</p>
+        </div>
+
+        <div class="feature-card" style="cursor: default; transform: none;">
+            <span class="feature-icon">👤</span>
+            <h3 class="feature-title">Individual Info</h3>
+            <p class="feature-desc">Name, account number, and identification details</p>
+        </div>
+
+        <div class="feature-card" style="cursor: default; transform: none;">
+            <span class="feature-icon">🏦</span>
+            <h3 class="feature-title">Banking Details</h3>
+            <p class="feature-desc">Receiving DFI, check digit, and routing information</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📝 Sample Trace Numbers</h2>
+    </div>
+
+    <div class="code-block">
+        <pre>076401250000001    ← First transaction
+076401250000002    ← Second transaction  
+076401250000003    ← Third transaction
+...
+076401250001000    ← 1000th transaction</pre>
+    </div>
+
+    <p style="margin-top: 1rem; color: var(--text-secondary);">
+        The trace number increments for each entry detail record within a batch.
+        Use these examples to test the lookup functionality.
+    </p>
+</div>
+
+<script>
+// Auto-format trace number input
+document.getElementById('trace_number').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+    if (value.length > 15) value = value.substring(0, 15);
+    e.target.value = value;
+    
+    // Visual feedback
+    if (value.length === 15) {
+        e.target.style.borderColor = 'var(--success-color)';
+    } else if (value.length > 0) {
+        e.target.style.borderColor = 'var(--warning-color)';
+    } else {
+        e.target.style.borderColor = 'var(--border-color)';
+    }
+});
+</script>
+{{end}} 

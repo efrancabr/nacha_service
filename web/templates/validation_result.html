@@ -1,0 +1,80 @@
+{{define "content"}}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">
+            {{if .Data.IsValid}}✅{{else}}❌{{end}} Validation Results
+        </h1>
+        <p class="card-subtitle">{{.Data.Message}}</p>
+    </div>
+
+    {{if .Data.IsValid}}
+    <div class="message message-success">
+        <strong>✅ File is Valid!</strong> Your NACHA file passed all validation checks.
+    </div>
+    {{else}}
+    <div class="message message-error">
+        <strong>❌ Validation Failed</strong> The file contains errors that need to be corrected.
+    </div>
+    {{end}}
+
+    {{if .Data.Errors}}
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">🔍 Validation Errors</h2>
+        </div>
+        <ul style="color: var(--error-color); margin-left: 1.5rem;">
+            {{range .Data.Errors}}
+            <li style="margin-bottom: 0.5rem;">{{.}}</li>
+            {{end}}
+        </ul>
+    </div>
+    {{end}}
+
+    <div class="grid grid-cols-3" style="margin-top: 2rem;">
+        <a href="/validate" class="btn btn-primary">
+            <span>🔄</span>
+            Validate Another File
+        </a>
+        
+        {{if .Data.IsValid}}
+        <a href="/view" class="btn btn-success">
+            <span>👁️</span>
+            View File Content
+        </a>
+        
+        <a href="/export" class="btn btn-secondary">
+            <span>💾</span>
+            Export File
+        </a>
+        {{end}}
+    </div>
+</div>
+
+{{if .Data.IsValid}}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">🎉 Next Steps</h2>
+    </div>
+
+    <div class="grid grid-cols-3">
+        <div class="feature-card">
+            <span class="feature-icon">👁️</span>
+            <h3 class="feature-title">View Content</h3>
+            <p class="feature-desc">Examine the detailed file structure and transaction data</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="feature-icon">💾</span>
+            <h3 class="feature-title">Export Data</h3>
+            <p class="feature-desc">Convert to different formats for analysis or integration</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="feature-icon">🔍</span>
+            <h3 class="feature-title">Transaction Details</h3>
+            <p class="feature-desc">Look up specific transactions by trace number</p>
+        </div>
+    </div>
+</div>
+{{end}}
+{{end}} 

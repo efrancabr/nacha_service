@@ -1,0 +1,150 @@
+{{define "content"}}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">💾 Export NACHA File</h1>
+        <p class="card-subtitle">Export NACHA files to multiple formats for different use cases</p>
+    </div>
+
+    <form method="GET" action="/export" id="export-form">
+        <div class="form-group">
+            <label for="content" class="form-label">NACHA File Content</label>
+            <textarea id="content" name="content" class="form-textarea" 
+                      placeholder="Paste your NACHA file content here..."
+                      style="min-height: 200px;" required></textarea>
+            <small style="color: var(--text-secondary);">
+                Enter the NACHA file content to export in your preferred format
+            </small>
+        </div>
+
+        <input type="hidden" name="format" id="format-input">
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📁 Choose Export Format</h2>
+        <p class="card-subtitle">Select the format that best suits your needs</p>
+    </div>
+
+    <div class="export-formats">
+        <button class="format-btn" onclick="exportFile('JSON')">
+            <span class="format-icon">📄</span>
+            JSON
+        </button>
+        <button class="format-btn" onclick="exportFile('CSV')">
+            <span class="format-icon">📊</span>
+            CSV
+        </button>
+        <button class="format-btn" onclick="exportFile('HTML')">
+            <span class="format-icon">🌐</span>
+            HTML
+        </button>
+        <button class="format-btn" onclick="exportFile('PDF')">
+            <span class="format-icon">📋</span>
+            PDF
+        </button>
+        <button class="format-btn" onclick="exportFile('TXT')">
+            <span class="format-icon">📝</span>
+            TXT
+        </button>
+        <button class="format-btn" onclick="exportFile('SQL')">
+            <span class="format-icon">🗄️</span>
+            SQL
+        </button>
+        <button class="format-btn" onclick="exportFile('PARQUET')">
+            <span class="format-icon">📦</span>
+            PARQUET
+        </button>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📋 Format Descriptions</h2>
+    </div>
+
+    <div class="grid grid-cols-2">
+        <div>
+            <h3 class="feature-title">📄 Structured Formats</h3>
+            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>JSON</strong> - Machine-readable data interchange</li>
+                <li><strong>CSV</strong> - Spreadsheet-compatible tabular data</li>
+                <li><strong>SQL</strong> - Database import statements</li>
+                <li><strong>PARQUET</strong> - Columnar storage for analytics</li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="feature-title">📋 Document Formats</h3>
+            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>HTML</strong> - Web-viewable formatted report</li>
+                <li><strong>PDF</strong> - Printable document format</li>
+                <li><strong>TXT</strong> - Plain text original format</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">💡 Use Cases</h2>
+    </div>
+
+    <div class="grid grid-cols-3">
+        <div class="feature-card" style="cursor: default; transform: none;">
+            <span class="feature-icon">🔍</span>
+            <h3 class="feature-title">Analysis</h3>
+            <p class="feature-desc">Use CSV or PARQUET for data analysis and reporting</p>
+        </div>
+
+        <div class="feature-card" style="cursor: default; transform: none;">
+            <span class="feature-icon">🗄️</span>
+            <h3 class="feature-title">Database</h3>
+            <p class="feature-desc">Use SQL format for importing into databases</p>
+        </div>
+
+        <div class="feature-card" style="cursor: default; transform: none;">
+            <span class="feature-icon">📱</span>
+            <h3 class="feature-title">Integration</h3>
+            <p class="feature-desc">Use JSON for API integration and web services</p>
+        </div>
+    </div>
+</div>
+
+<script>
+function exportFile(format) {
+    const content = document.getElementById('content').value.trim();
+    if (!content) {
+        alert('Please enter NACHA file content before exporting.');
+        document.getElementById('content').focus();
+        return;
+    }
+
+    // Set the format and submit
+    document.getElementById('format-input').value = format;
+    document.getElementById('export-form').submit();
+}
+
+// Visual feedback for format buttons
+document.querySelectorAll('.format-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // Remove active class from all buttons
+        document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+        // Add active class to clicked button
+        this.classList.add('active');
+    });
+});
+
+// Add active state styles
+const style = document.createElement('style');
+style.textContent = `
+    .format-btn.active {
+        border-color: var(--primary-color) !important;
+        background: var(--primary-color) !important;
+        color: white !important;
+        transform: translateY(-2px) !important;
+    }
+`;
+document.head.appendChild(style);
+</script>
+{{end}} 

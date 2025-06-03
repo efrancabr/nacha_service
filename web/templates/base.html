@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}} - NACHA File Processor</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                NACHA Processor
+            </div>
+            <nav class="nav">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/create" class="nav-link">Create</a>
+                <a href="/upload" class="nav-link">Upload</a>
+                <a href="/validate" class="nav-link">Validate</a>
+                <a href="/view" class="nav-link">View</a>
+                <a href="/export" class="nav-link">Export</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container fade-in">
+        {{if .Error}}
+        <div class="message message-error">
+            <strong>Error:</strong> {{.Error}}
+        </div>
+        {{end}}
+
+        {{if .Message}}
+        <div class="message message-success">
+            {{.Message}}
+        </div>
+        {{end}}
+
+        {{template "content" .}}
+    </main>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html> 

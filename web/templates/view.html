@@ -1,0 +1,85 @@
+{{define "content"}}
+<div class="card">
+    <div class="card-header">
+        <h1 class="card-title">👁️ View NACHA File</h1>
+        <p class="card-subtitle">Analyze and examine NACHA file structure and content</p>
+    </div>
+
+    <form method="POST" action="/view">
+        <div class="form-group">
+            <label for="file_content" class="form-label">NACHA File Content</label>
+            <textarea id="file_content" name="file_content" class="form-textarea" 
+                      placeholder="Paste your NACHA file content here..."
+                      style="min-height: 200px;" required></textarea>
+            <small style="color: var(--text-secondary);">
+                Enter the complete NACHA file content to view detailed structure and information
+            </small>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">
+                <span>👁️</span>
+                View File Content
+            </button>
+            <a href="/" class="btn btn-outline" style="margin-left: 1rem;">
+                <span>↩️</span>
+                Back to Home
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📊 What You'll See</h2>
+    </div>
+
+    <div class="grid grid-cols-3">
+        <div class="feature-card" style="cursor: default; transform: none;">
+            <span class="feature-icon">📄</span>
+            <h3 class="feature-title">File Header</h3>
+            <p class="feature-desc">Routing information, creation date, and file metadata</p>
+        </div>
+
+        <div class="feature-card" style="cursor: default; transform: none;">
+            <span class="feature-icon">📦</span>
+            <h3 class="feature-title">Batch Details</h3>
+            <p class="feature-desc">Service class codes, company information, and entry counts</p>
+        </div>
+
+        <div class="feature-card" style="cursor: default; transform: none;">
+            <span class="feature-icon">📈</span>
+            <h3 class="feature-title">Statistics</h3>
+            <p class="feature-desc">Total amounts, entry counts, and batch summaries</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">💡 File Analysis Features</h2>
+    </div>
+
+    <div class="grid grid-cols-2">
+        <div>
+            <h3 class="feature-title">🔍 Detailed Breakdown</h3>
+            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>File header information display</li>
+                <li>Batch-by-batch analysis</li>
+                <li>Entry detail summaries</li>
+                <li>Control total verification</li>
+            </ul>
+        </div>
+
+        <div>
+            <h3 class="feature-title">📊 Statistical Overview</h3>
+            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Total transaction amounts</li>
+                <li>Number of batches and entries</li>
+                <li>Service class distribution</li>
+                <li>Entry hash calculations</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{{end}} 
