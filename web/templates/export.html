@@ -1,150 +1,703 @@
-{{define "content"}}
-<div class="card">
-    <div class="card-header">
-        <h1 class="card-title">💾 Export NACHA File</h1>
-        <p class="card-subtitle">Export NACHA files to multiple formats for different use cases</p>
-    </div>
-
-    <form method="GET" action="/export" id="export-form">
-        <div class="form-group">
-            <label for="content" class="form-label">NACHA File Content</label>
-            <textarea id="content" name="content" class="form-textarea" 
-                      placeholder="Paste your NACHA file content here..."
-                      style="min-height: 200px;" required></textarea>
-            <small style="color: var(--text-secondary);">
-                Enter the NACHA file content to export in your preferred format
-            </small>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}} - Processador NACHA</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+    <meta name="description" content="Sistema profissional de processamento de arquivos NACHA com validação e exportação">
+    <meta name="keywords" content="NACHA, ACH, processamento, arquivos, validação, exportação">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">
+                    <svg class="icon icon--primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="logo-text">Processador NACHA</span>
+            </div>
+            <nav class="nav">
+                <a href="/" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 12L5 10M5 10L12 3L19 10M5 10V20C5 20.5523 5.44772 21 6 21H9M19 10L21 12M19 10V20C19 20.5523 18.5523 21 18 21H15M9 21C9.55228 21 10 20.5523 10 20V16C10 15.4477 10.4477 15 11 15H13C13.5523 15 14 15.4477 14 16V20C14 20.5523 14.4477 21 15 21M9 21H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Início</span>
+                </a>
+                <a href="/create" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Criar</span>
+                </a>
+                <a href="/upload" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M17 8L12 3L7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Upload</span>
+                </a>
+                <a href="/validate" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.7088 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4905 2.02168 11.3363C2.16356 9.18203 2.99721 7.13214 4.39828 5.49883C5.79935 3.86553 7.69279 2.72636 9.79619 2.24223C11.8996 1.75809 14.1003 1.95185 16.07 2.79" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Validar</span>
+                </a>
+                <a href="/view" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Visualizar</span>
+                </a>
+                <a href="/export" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Exportar</span>
+                </a>
+            </nav>
+            <div class="mobile-menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
+    </header>
 
-        <input type="hidden" name="format" id="format-input">
-    </form>
-</div>
-
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">📁 Choose Export Format</h2>
-        <p class="card-subtitle">Select the format that best suits your needs</p>
-    </div>
-
-    <div class="export-formats">
-        <button class="format-btn" onclick="exportFile('JSON')">
-            <span class="format-icon">📄</span>
-            JSON
-        </button>
-        <button class="format-btn" onclick="exportFile('CSV')">
-            <span class="format-icon">📊</span>
-            CSV
-        </button>
-        <button class="format-btn" onclick="exportFile('HTML')">
-            <span class="format-icon">🌐</span>
-            HTML
-        </button>
-        <button class="format-btn" onclick="exportFile('PDF')">
-            <span class="format-icon">📋</span>
-            PDF
-        </button>
-        <button class="format-btn" onclick="exportFile('TXT')">
-            <span class="format-icon">📝</span>
-            TXT
-        </button>
-        <button class="format-btn" onclick="exportFile('SQL')">
-            <span class="format-icon">🗄️</span>
-            SQL
-        </button>
-        <button class="format-btn" onclick="exportFile('PARQUET')">
-            <span class="format-icon">📦</span>
-            PARQUET
-        </button>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">📋 Format Descriptions</h2>
-    </div>
-
-    <div class="grid grid-cols-2">
-        <div>
-            <h3 class="feature-title">📄 Structured Formats</h3>
-            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
-                <li><strong>JSON</strong> - Machine-readable data interchange</li>
-                <li><strong>CSV</strong> - Spreadsheet-compatible tabular data</li>
-                <li><strong>SQL</strong> - Database import statements</li>
-                <li><strong>PARQUET</strong> - Columnar storage for analytics</li>
-            </ul>
+    <main class="main-content fade-in">
+        {{if .Error}}
+        <div class="notification error">
+            <div class="notification-icon">
+                <svg class="icon icon--error" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M15 9L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M9 9L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="notification-content">
+                <div class="notification-title">Erro</div>
+                <div class="notification-message">{{.Error}}</div>
+            </div>
         </div>
+        {{end}}
 
-        <div>
-            <h3 class="feature-title">📋 Document Formats</h3>
-            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
-                <li><strong>HTML</strong> - Web-viewable formatted report</li>
-                <li><strong>PDF</strong> - Printable document format</li>
-                <li><strong>TXT</strong> - Plain text original format</li>
-            </ul>
+        {{if .Message}}
+        <div class="notification success">
+            <div class="notification-icon">
+                <svg class="icon icon--success" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="notification-content">
+                <div class="notification-title">Sucesso</div>
+                <div class="notification-message">{{.Message}}</div>
+            </div>
         </div>
-    </div>
-</div>
+        {{end}}
 
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">💡 Use Cases</h2>
-    </div>
+        <div class="container">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">💾 Exportar Arquivo NACHA</h1>
+                    <p class="card-subtitle">
+                        Exporte o arquivo NACHA em diferentes formatos para integração 
+                        com sistemas externos ou análise de dados.
+                    </p>
+                </div>
 
-    <div class="grid grid-cols-3">
-        <div class="feature-card" style="cursor: default; transform: none;">
-            <span class="feature-icon">🔍</span>
-            <h3 class="feature-title">Analysis</h3>
-            <p class="feature-desc">Use CSV or PARQUET for data analysis and reporting</p>
+                {{if .CurrentSession}}
+                <div class="session-info">
+                    <div class="session-header">
+                        <span class="session-icon">📁</span>
+                        <div class="session-details">
+                            <h3 class="session-title">Arquivo em Sessão</h3>
+                            <p class="session-filename">{{.CurrentSession.FileName}}</p>
+                            <p class="session-time">Carregado em: {{.CurrentSession.UploadTime.Format "02/01/2006 15:04:05"}}</p>
+                            {{if .CurrentSession.ParsedData}}
+                            <div class="session-stats">
+                                <span class="stat">{{index .CurrentSession.ParsedData.Statistics "total_batches"}} lotes</span>
+                                <span class="stat">{{index .CurrentSession.ParsedData.Statistics "total_entries"}} entradas</span>
+                                <span class="stat">R$ {{printf "%.2f" (index .CurrentSession.ParsedData.Statistics "total_amount_formatted")}}</span>
+                            </div>
+                            {{end}}
+                        </div>
+                    </div>
+
+                    <form method="post" class="export-form session-export">
+                        <div class="format-selection">
+                            <h4 class="format-title">📂 Escolha o Formato de Exportação</h4>
+                            <div class="format-grid">
+                                <label class="format-option">
+                                    <input type="radio" name="format" value="json" checked>
+                                    <div class="format-card">
+                                        <div class="format-icon">📄</div>
+                                        <div class="format-name">JSON</div>
+                                        <div class="format-desc">Formato estruturado para APIs</div>
+                                    </div>
+                                </label>
+
+                                <label class="format-option">
+                                    <input type="radio" name="format" value="csv">
+                                    <div class="format-card">
+                                        <div class="format-icon">📊</div>
+                                        <div class="format-name">CSV</div>
+                                        <div class="format-desc">Planilhas e Excel</div>
+                                    </div>
+                                </label>
+
+                                <label class="format-option">
+                                    <input type="radio" name="format" value="html">
+                                    <div class="format-card">
+                                        <div class="format-icon">🌐</div>
+                                        <div class="format-name">HTML</div>
+                                        <div class="format-desc">Relatório visual</div>
+                                    </div>
+                                </label>
+
+                                <label class="format-option">
+                                    <input type="radio" name="format" value="txt">
+                                    <div class="format-card">
+                                        <div class="format-icon">📝</div>
+                                        <div class="format-name">TXT</div>
+                                        <div class="format-desc">Texto puro</div>
+                                    </div>
+                                </label>
+
+                                <label class="format-option">
+                                    <input type="radio" name="format" value="sql">
+                                    <div class="format-card">
+                                        <div class="format-icon">🗄️</div>
+                                        <div class="format-name">SQL</div>
+                                        <div class="format-desc">Script de banco</div>
+                                    </div>
+                                </label>
+
+                                <label class="format-option">
+                                    <input type="radio" name="format" value="parquet">
+                                    <div class="format-card">
+                                        <div class="format-icon">⚡</div>
+                                        <div class="format-name">Parquet</div>
+                                        <div class="format-desc">Big Data</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="export-actions">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <span class="btn-icon">📥</span>
+                                <span class="btn-text">Exportar Arquivo da Sessão</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="divider">
+                    <span class="divider-text">ou</span>
+                </div>
+                {{end}}
+
+                <form method="post" class="export-form manual-export">
+                    <div class="form-section">
+                        <h3 class="form-section-title">📝 Exportar Conteúdo Manual</h3>
+                        <p class="form-section-desc">Cole o conteúdo do arquivo NACHA para exportação</p>
+                        
+                        <div class="form-group">
+                            <label for="content" class="form-label">Conteúdo do Arquivo NACHA</label>
+                            <textarea id="content" name="content" class="form-textarea" rows="12" 
+                                      placeholder="Cole aqui o conteúdo completo do arquivo NACHA..."
+                                      {{if not .CurrentSession}}required{{end}}>{{if .Data}}{{.Data}}{{end}}</textarea>
+                            <small class="form-help">Formato NACHA padrão com registros de 94 caracteres</small>
+                        </div>
+
+                        <div class="format-selection">
+                            <h4 class="format-title">📂 Formato de Exportação</h4>
+                            <div class="format-grid">
+                                <label class="format-option">
+                                    <input type="radio" name="format" value="json" checked>
+                                    <div class="format-card">
+                                        <div class="format-icon">📄</div>
+                                        <div class="format-name">JSON</div>
+                                        <div class="format-desc">Formato estruturado para APIs</div>
+                                    </div>
+                                </label>
+
+                                <label class="format-option">
+                                    <input type="radio" name="format" value="csv">
+                                    <div class="format-card">
+                                        <div class="format-icon">📊</div>
+                                        <div class="format-name">CSV</div>
+                                        <div class="format-desc">Planilhas e Excel</div>
+                                    </div>
+                                </label>
+
+                                <label class="format-option">
+                                    <input type="radio" name="format" value="html">
+                                    <div class="format-card">
+                                        <div class="format-icon">🌐</div>
+                                        <div class="format-name">HTML</div>
+                                        <div class="format-desc">Relatório visual</div>
+                                    </div>
+                                </label>
+
+                                <label class="format-option">
+                                    <input type="radio" name="format" value="txt">
+                                    <div class="format-card">
+                                        <div class="format-icon">📝</div>
+                                        <div class="format-name">TXT</div>
+                                        <div class="format-desc">Texto puro original</div>
+                                    </div>
+                                </label>
+
+                                <label class="format-option">
+                                    <input type="radio" name="format" value="sql">
+                                    <div class="format-card">
+                                        <div class="format-icon">🗄️</div>
+                                        <div class="format-name">SQL</div>
+                                        <div class="format-desc">Script de banco de dados</div>
+                                    </div>
+                                </label>
+
+                                <label class="format-option">
+                                    <input type="radio" name="format" value="parquet">
+                                    <div class="format-card">
+                                        <div class="format-icon">⚡</div>
+                                        <div class="format-name">Parquet</div>
+                                        <div class="format-desc">Formato para Big Data</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <span class="btn-icon">📤</span>
+                            <span class="btn-text">Exportar Conteúdo</span>
+                        </button>
+                        <a href="/" class="btn btn-secondary">
+                            <span class="btn-icon">🏠</span>
+                            <span class="btn-text">Voltar ao Início</span>
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="formats-info">
+                <div class="section-header">
+                    <h2 class="section-title">📋 Formatos de Exportação Disponíveis</h2>
+                    <p class="section-subtitle">Cada formato é otimizado para diferentes casos de uso</p>
+                </div>
+
+                <div class="grid grid-cols-2">
+                    <div class="format-info-card">
+                        <div class="format-info-header">
+                            <span class="format-info-icon">📄</span>
+                            <h3 class="format-info-title">JSON</h3>
+                        </div>
+                        <div class="format-info-content">
+                            <p class="format-info-desc">Formato estruturado ideal para integração com APIs e sistemas modernos</p>
+                            <ul class="format-features">
+                                <li>✓ Estrutura hierárquica</li>
+                                <li>✓ Facilmente parseável</li>
+                                <li>✓ Suporte nativo em linguagens</li>
+                                <li>✓ Ideal para APIs REST</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="format-info-card">
+                        <div class="format-info-header">
+                            <span class="format-info-icon">📊</span>
+                            <h3 class="format-info-title">CSV</h3>
+                        </div>
+                        <div class="format-info-content">
+                            <p class="format-info-desc">Formato tabular compatível com Excel e ferramentas de planilha</p>
+                            <ul class="format-features">
+                                <li>✓ Compatível com Excel</li>
+                                <li>✓ Facilmente editável</li>
+                                <li>✓ Ideal para análise</li>
+                                <li>✓ Leve e eficiente</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="format-info-card">
+                        <div class="format-info-header">
+                            <span class="format-info-icon">🌐</span>
+                            <h3 class="format-info-title">HTML</h3>
+                        </div>
+                        <div class="format-info-content">
+                            <p class="format-info-desc">Relatório visual formatado para apresentação e impressão</p>
+                            <ul class="format-features">
+                                <li>✓ Visualização rica</li>
+                                <li>✓ Pronto para impressão</li>
+                                <li>✓ Tabelas formatadas</li>
+                                <li>✓ Compartilhamento fácil</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="format-info-card">
+                        <div class="format-info-header">
+                            <span class="format-info-icon">🗄️</span>
+                            <h3 class="format-info-title">SQL</h3>
+                        </div>
+                        <div class="format-info-content">
+                            <p class="format-info-desc">Scripts SQL para importação direta em bancos de dados</p>
+                            <ul class="format-features">
+                                <li>✓ Import automático</li>
+                                <li>✓ Estrutura de tabelas</li>
+                                <li>✓ Comandos INSERT</li>
+                                <li>✓ Compatível com SGBD</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </main>
 
-        <div class="feature-card" style="cursor: default; transform: none;">
-            <span class="feature-icon">🗄️</span>
-            <h3 class="feature-title">Database</h3>
-            <p class="feature-desc">Use SQL format for importing into databases</p>
-        </div>
-
-        <div class="feature-card" style="cursor: default; transform: none;">
-            <span class="feature-icon">📱</span>
-            <h3 class="feature-title">Integration</h3>
-            <p class="feature-desc">Use JSON for API integration and web services</p>
-        </div>
-    </div>
-</div>
-
-<script>
-function exportFile(format) {
-    const content = document.getElementById('content').value.trim();
-    if (!content) {
-        alert('Please enter NACHA file content before exporting.');
-        document.getElementById('content').focus();
-        return;
+    <style>
+    .session-info {
+        background: var(--glass-background);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-left: 4px solid var(--primary-color);
     }
 
-    // Set the format and submit
-    document.getElementById('format-input').value = format;
-    document.getElementById('export-form').submit();
-}
-
-// Visual feedback for format buttons
-document.querySelectorAll('.format-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        // Remove active class from all buttons
-        document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
-        // Add active class to clicked button
-        this.classList.add('active');
-    });
-});
-
-// Add active state styles
-const style = document.createElement('style');
-style.textContent = `
-    .format-btn.active {
-        border-color: var(--primary-color) !important;
-        background: var(--primary-color) !important;
-        color: white !important;
-        transform: translateY(-2px) !important;
+    .session-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 2rem;
     }
-`;
-document.head.appendChild(style);
-</script>
-{{end}} 
+
+    .session-icon {
+        font-size: 2rem;
+        filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.3));
+        margin-top: 0.25rem;
+    }
+
+    .session-details {
+        flex-grow: 1;
+    }
+
+    .session-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .session-filename {
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 0.25rem;
+    }
+
+    .session-time {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+
+    .session-stats {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .stat {
+        background: var(--glass-background);
+        padding: 0.5rem 1rem;
+        border-radius: var(--border-radius-sm);
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+        font-weight: 500;
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 2rem 0;
+        text-align: center;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border-color);
+    }
+
+    .divider-text {
+        padding: 0 1rem;
+        background: var(--background-color);
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .form-section {
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: var(--glass-background);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        backdrop-filter: blur(10px);
+    }
+
+    .form-section-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .form-section-desc {
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .format-selection {
+        margin: 2rem 0;
+    }
+
+    .format-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .format-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+    }
+
+    .format-option {
+        cursor: pointer;
+    }
+
+    .format-option input[type="radio"] {
+        display: none;
+    }
+
+    .format-card {
+        background: var(--card-background);
+        border: 2px solid var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        text-align: center;
+        transition: all var(--transition-normal);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 120px;
+    }
+
+    .format-option input[type="radio"]:checked + .format-card {
+        border-color: var(--primary-color);
+        background: rgba(59, 130, 246, 0.1);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .format-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+        border-color: var(--primary-light);
+    }
+
+    .format-icon {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+    }
+
+    .format-name {
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .format-desc {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        line-height: 1.4;
+    }
+
+    .export-actions,
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+
+    .btn-lg {
+        padding: 1.25rem 2.5rem;
+        font-size: 1.1rem;
+    }
+
+    .btn-secondary {
+        background: var(--glass-background);
+        color: var(--text-primary);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(20px);
+    }
+
+    .btn-secondary:hover {
+        background: var(--glass-border);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+
+    .formats-info {
+        margin-top: 4rem;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: var(--gradient-text);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .section-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+    }
+
+    .format-info-card {
+        background: var(--glass-background);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius-lg);
+        padding: 2rem;
+        transition: all var(--transition-normal);
+    }
+
+    .format-info-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .format-info-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .format-info-icon {
+        font-size: 1.5rem;
+    }
+
+    .format-info-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .format-info-content {
+        color: var(--text-secondary);
+    }
+
+    .format-info-desc {
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+
+    .format-features {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .format-features li {
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+        .format-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .session-header {
+            flex-direction: column;
+        }
+        
+        .session-stats {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .export-actions,
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .formats-info .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    </style>
+</body>
+</html> 

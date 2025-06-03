@@ -1,130 +1,672 @@
 {{define "content"}}
 <div class="card">
     <div class="card-header">
-        <h1 class="card-title">🔍 Transaction Details</h1>
-        <p class="card-subtitle">Look up specific transaction details by trace number</p>
+        <h1 class="card-title">🔍 Detalhes da Transação</h1>
+        <p class="card-subtitle">
+            Busque e examine detalhes específicos de transações usando o número de rastreamento. 
+            Obtenha informações completas sobre valores, contas e beneficiários.
+        </p>
     </div>
 
-    <form method="GET" action="/details">
-        <div class="grid grid-cols-2">
-            <div class="form-group">
-                <label for="content" class="form-label">NACHA File Content</label>
-                <textarea id="content" name="content" class="form-textarea" 
-                          placeholder="Paste your NACHA file content here..."
-                          style="min-height: 150px;" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="trace_number" class="form-label">Trace Number</label>
-                <input type="text" id="trace_number" name="trace_number" 
-                       class="form-input" placeholder="076401250000000" maxlength="15" required>
-                <small style="color: var(--text-secondary);">
-                    Enter the 15-character trace number to lookup
-                </small>
+    {{if .CurrentSession}}
+    <div class="session-info">
+        <div class="session-header">
+            <span class="session-icon">📁</span>
+            <div class="session-details">
+                <h3 class="session-title">Arquivo em Sessão</h3>
+                <p class="session-filename">{{.CurrentSession.FileName}}</p>
+                <p class="session-time">Carregado em: {{.CurrentSession.UploadTime.Format "02/01/2006 15:04:05"}}</p>
+                {{if .CurrentSession.ParsedData}}
+                <div class="session-stats">
+                    <span class="stat">{{index .CurrentSession.ParsedData.Statistics "total_entries"}} transações</span>
+                    <span class="stat">{{index .CurrentSession.ParsedData.Statistics "total_batches"}} lotes</span>
+                </div>
+                {{end}}
             </div>
         </div>
 
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary">
-                <span>🔍</span>
-                Find Transaction
+        <form method="post" class="search-form session-search">
+            <div class="search-section">
+                <h4 class="search-title">🔎 Buscar Transação no Arquivo</h4>
+                <div class="search-input-group">
+                    <input type="text" id="trace_number_session" name="trace_number" 
+                           class="search-input" placeholder="Ex: 076401250000001" 
+                           pattern="[0-9]{15}" maxlength="15" required>
+                    <button type="submit" class="search-btn">
+                        <span class="search-icon">🔍</span>
+                        <span class="search-text">Buscar</span>
+                    </button>
+                </div>
+                <small class="search-help">Digite o número de rastreamento de 15 dígitos</small>
+            </div>
+        </form>
+    </div>
+
+    <div class="divider">
+        <span class="divider-text">ou</span>
+    </div>
+    {{end}}
+
+    <form method="post" class="search-form manual-search">
+        <div class="form-section">
+            <h3 class="form-section-title">📝 Buscar em Conteúdo Manual</h3>
+            <p class="form-section-desc">Cole o conteúdo do arquivo NACHA e especifique o número de rastreamento</p>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="content" class="form-label">Conteúdo do Arquivo NACHA</label>
+                    <textarea id="content" name="content" class="form-textarea" rows="10" 
+                              placeholder="Cole aqui o conteúdo completo do arquivo NACHA..."
+                              {{if not .CurrentSession}}required{{end}}>{{if .Data}}{{.Data}}{{end}}</textarea>
+                    <small class="form-help">Arquivo NACHA com registros de entrada (tipo 6)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="trace_number" class="form-label">Número de Rastreamento</label>
+                    <input type="text" id="trace_number" name="trace_number" 
+                           class="form-input" placeholder="Ex: 076401250000001" 
+                           pattern="[0-9]{15}" maxlength="15" required>
+                    <small class="form-help">Número de rastreamento único de 15 dígitos</small>
+                    
+                    <div class="trace-examples">
+                        <span class="example-label">Exemplos:</span>
+                        <button type="button" class="example-btn" onclick="fillExample('076401250000001')">076401250000001</button>
+                        <button type="button" class="example-btn" onclick="fillExample('123456780000001')">123456780000001</button>
+                        <button type="button" class="example-btn" onclick="fillExample('987654320000001')">987654320000001</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <span class="btn-icon">🔍</span>
+                <span class="btn-text">Buscar Transação</span>
             </button>
-            <a href="/" class="btn btn-outline" style="margin-left: 1rem;">
-                <span>↩️</span>
-                Back to Home
+            <a href="/" class="btn btn-secondary">
+                <span class="btn-icon">🏠</span>
+                <span class="btn-text">Voltar ao Início</span>
             </a>
         </div>
     </form>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">📋 About Trace Numbers</h2>
-    </div>
-
-    <div class="grid grid-cols-2">
-        <div>
-            <h3 class="feature-title">🔢 Format</h3>
-            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
-                <li>15 characters total</li>
-                <li>First 8 digits: Originating DFI routing number</li>
-                <li>Last 7 digits: Sequential entry number</li>
-                <li>Example: 076401250000001</li>
-            </ul>
-        </div>
-
-        <div>
-            <h3 class="feature-title">🎯 Purpose</h3>
-            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
-                <li>Unique transaction identifier</li>
-                <li>Track specific entries</li>
-                <li>Audit and reconciliation</li>
-                <li>Error resolution</li>
-            </ul>
-        </div>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">🔍 What You'll Find</h2>
+<div class="info-section">
+    <div class="section-header">
+        <h2 class="section-title">📋 Como Funciona a Busca</h2>
+        <p class="section-subtitle">Informações sobre números de rastreamento e busca de transações</p>
     </div>
 
     <div class="grid grid-cols-3">
-        <div class="feature-card" style="cursor: default; transform: none;">
-            <span class="feature-icon">💰</span>
-            <h3 class="feature-title">Transaction Data</h3>
-            <p class="feature-desc">Amount, transaction code, and account information</p>
+        <div class="info-card">
+            <div class="info-header">
+                <span class="info-icon">🔢</span>
+                <h3 class="info-title">Número de Rastreamento</h3>
+            </div>
+            <div class="info-content">
+                <p class="info-desc">Identificador único de 15 dígitos para cada transação NACHA</p>
+                <ul class="info-list">
+                    <li>8 dígitos: ODFI (banco originador)</li>
+                    <li>7 dígitos: Número sequencial</li>
+                    <li>Posições 79-93 no registro</li>
+                    <li>Único por lote processado</li>
+                </ul>
+            </div>
         </div>
 
-        <div class="feature-card" style="cursor: default; transform: none;">
-            <span class="feature-icon">👤</span>
-            <h3 class="feature-title">Individual Info</h3>
-            <p class="feature-desc">Name, account number, and identification details</p>
+        <div class="info-card">
+            <div class="info-header">
+                <span class="info-icon">📊</span>
+                <h3 class="info-title">Informações Retornadas</h3>
+            </div>
+            <div class="info-content">
+                <p class="info-desc">Dados completos da transação encontrada</p>
+                <ul class="info-list">
+                    <li>Código da transação</li>
+                    <li>Banco receptor (DFI)</li>
+                    <li>Número da conta</li>
+                    <li>Valor da transação</li>
+                    <li>Nome do beneficiário</li>
+                    <li>Identificação (CPF/CNPJ)</li>
+                </ul>
+            </div>
         </div>
 
-        <div class="feature-card" style="cursor: default; transform: none;">
-            <span class="feature-icon">🏦</span>
-            <h3 class="feature-title">Banking Details</h3>
-            <p class="feature-desc">Receiving DFI, check digit, and routing information</p>
+        <div class="info-card">
+            <div class="info-header">
+                <span class="info-icon">⚡</span>
+                <h3 class="info-title">Busca Rápida</h3>
+            </div>
+            <div class="info-content">
+                <p class="info-desc">Sistema otimizado para localização eficiente</p>
+                <ul class="info-list">
+                    <li>Busca em registros tipo 6</li>
+                    <li>Comparação exata de números</li>
+                    <li>Resultado instantâneo</li>
+                    <li>Validação de formato</li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">📝 Sample Trace Numbers</h2>
+<div class="sample-section">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">📄 Exemplo de Registro de Entrada</h2>
+        </div>
+        
+        <div class="sample-content">
+            <div class="sample-code">
+                <pre><code>622<span class="highlight-bank">12345678</span><span class="highlight-account">901234567890123456</span><span class="highlight-amount">0000123400</span><span class="highlight-id">12345678901</span><span class="highlight-name">JOAO DA SILVA      </span><span class="highlight-trace">076401250000001</span></code></pre>
+            </div>
+            
+            <div class="sample-legend">
+                <div class="legend-item">
+                    <span class="legend-color highlight-bank"></span>
+                    <span class="legend-text">Banco Receptor (DFI)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color highlight-account"></span>
+                    <span class="legend-text">Número da Conta</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color highlight-amount"></span>
+                    <span class="legend-text">Valor (R$ 1.234,00)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color highlight-id"></span>
+                    <span class="legend-text">Identificação</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color highlight-name"></span>
+                    <span class="legend-text">Nome do Beneficiário</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color highlight-trace"></span>
+                    <span class="legend-text">Número de Rastreamento</span>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="code-block">
-        <pre>076401250000001    ← First transaction
-076401250000002    ← Second transaction  
-076401250000003    ← Third transaction
-...
-076401250001000    ← 1000th transaction</pre>
-    </div>
-
-    <p style="margin-top: 1rem; color: var(--text-secondary);">
-        The trace number increments for each entry detail record within a batch.
-        Use these examples to test the lookup functionality.
-    </p>
 </div>
+
+<style>
+.session-info {
+    background: var(--glass-background);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--accent-color);
+}
+
+.session-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.session-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 4px 12px rgba(139, 92, 246, 0.3));
+    margin-top: 0.25rem;
+}
+
+.session-details {
+    flex-grow: 1;
+}
+
+.session-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.session-filename {
+    font-weight: 600;
+    color: var(--accent-color);
+    margin-bottom: 0.25rem;
+}
+
+.session-time {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.session-stats {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.stat {
+    background: var(--glass-background);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    font-weight: 500;
+}
+
+.search-section {
+    text-align: center;
+}
+
+.search-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.search-input-group {
+    display: flex;
+    gap: 0.5rem;
+    max-width: 500px;
+    margin: 0 auto 1rem;
+}
+
+.search-input {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    background: var(--input-background);
+    color: var(--text-primary);
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    letter-spacing: 0.1em;
+    transition: all var(--transition-normal);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+    background: var(--glass-background);
+}
+
+.search-btn {
+    padding: 1rem 2rem;
+    background: var(--gradient-accent);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.search-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow-purple);
+}
+
+.search-help {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 2rem 0;
+    text-align: center;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-color);
+}
+
+.divider-text {
+    padding: 0 1rem;
+    background: var(--background-color);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.form-section {
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: var(--glass-background);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+}
+
+.form-section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.form-section-desc {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+.trace-examples {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--glass-background);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.example-label {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.example-btn {
+    display: inline-block;
+    margin: 0.25rem;
+    padding: 0.5rem 1rem;
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-xs);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-size: 0.85rem;
+}
+
+.example-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.btn-lg {
+    padding: 1.25rem 2.5rem;
+    font-size: 1.1rem;
+}
+
+.btn-secondary {
+    background: var(--glass-background);
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+}
+
+.btn-secondary:hover {
+    background: var(--glass-border);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.info-section {
+    margin-top: 4rem;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: var(--gradient-text);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.section-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.info-card {
+    background: var(--glass-background);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    transition: all var(--transition-normal);
+}
+
+.info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.info-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.3));
+}
+
+.info-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.info-desc {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-list li {
+    padding: 0.5rem 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.info-list li::before {
+    content: '▶';
+    position: absolute;
+    left: 0;
+    color: var(--accent-color);
+    font-size: 0.7rem;
+}
+
+.sample-section {
+    margin-top: 4rem;
+}
+
+.sample-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.sample-code {
+    background: var(--background-secondary);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    overflow-x: auto;
+}
+
+.sample-code pre {
+    margin: 0;
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--text-primary);
+}
+
+.sample-legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--glass-background);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.legend-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Syntax highlighting */
+.highlight-bank { background: rgba(255, 107, 107, 0.3); }
+.highlight-account { background: rgba(54, 162, 235, 0.3); }
+.highlight-amount { background: rgba(75, 192, 192, 0.3); }
+.highlight-id { background: rgba(255, 205, 86, 0.3); }
+.highlight-name { background: rgba(153, 102, 255, 0.3); }
+.highlight-trace { background: rgba(255, 159, 64, 0.3); }
+
+.form-textarea {
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+    .session-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .session-stats {
+        justify-content: center;
+    }
+    
+    .search-input-group {
+        flex-direction: column;
+    }
+    
+    .search-btn {
+        justify-content: center;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-lg {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+    }
+    
+    .sample-legend {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 
 <script>
-// Auto-format trace number input
-document.getElementById('trace_number').addEventListener('input', function(e) {
-    let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
-    if (value.length > 15) value = value.substring(0, 15);
-    e.target.value = value;
+function fillExample(traceNumber) {
+    const input = document.getElementById('trace_number');
+    input.value = traceNumber;
+    input.focus();
     
-    // Visual feedback
-    if (value.length === 15) {
-        e.target.style.borderColor = 'var(--success-color)';
-    } else if (value.length > 0) {
-        e.target.style.borderColor = 'var(--warning-color)';
-    } else {
-        e.target.style.borderColor = 'var(--border-color)';
-    }
+    // Add visual feedback
+    input.style.backgroundColor = 'rgba(139, 92, 246, 0.1)';
+    setTimeout(() => {
+        input.style.backgroundColor = '';
+    }, 1000);
+}
+
+// Auto-format trace number input
+document.addEventListener('DOMContentLoaded', function() {
+    const traceInputs = document.querySelectorAll('input[name="trace_number"]');
+    
+    traceInputs.forEach(input => {
+        input.addEventListener('input', function(e) {
+            // Remove non-digits
+            let value = e.target.value.replace(/\D/g, '');
+            
+            // Limit to 15 digits
+            if (value.length > 15) {
+                value = value.slice(0, 15);
+            }
+            
+            e.target.value = value;
+            
+            // Visual feedback for valid length
+            if (value.length === 15) {
+                e.target.style.borderColor = 'var(--success-color)';
+            } else if (value.length > 0) {
+                e.target.style.borderColor = 'var(--warning-color)';
+            } else {
+                e.target.style.borderColor = 'var(--border-color)';
+            }
+        });
+    });
 });
 </script>
 {{end}} 

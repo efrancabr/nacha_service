@@ -1,102 +1,666 @@
-{{define "content"}}
-<div class="card">
-    <div class="card-header">
-        <h1 class="card-title">📤 Upload NACHA File</h1>
-        <p class="card-subtitle">Upload an existing NACHA file for validation and processing</p>
-    </div>
-
-    <form method="POST" action="/upload" enctype="multipart/form-data">
-        <div class="file-upload">
-            <div class="file-upload-icon">📁</div>
-            <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Choose NACHA File</h3>
-            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                Select a .txt or .ach file to upload and process
-            </p>
-            <input type="file" name="nacha_file" accept=".txt,.ach" required 
-                   style="margin-bottom: 1rem;" id="file-input">
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}} - Processador NACHA</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+    <meta name="description" content="Sistema profissional de processamento de arquivos NACHA com validação e exportação">
+    <meta name="keywords" content="NACHA, ACH, processamento, arquivos, validação, exportação">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">
+                    <svg class="icon icon--primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="logo-text">Processador NACHA</span>
+            </div>
+            <nav class="nav">
+                <a href="/" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 12L5 10M5 10L12 3L19 10M5 10V20C5 20.5523 5.44772 21 6 21H9M19 10L21 12M19 10V20C19 20.5523 18.5523 21 18 21H15M9 21C9.55228 21 10 20.5523 10 20V16C10 15.4477 10.4477 15 11 15H13C13.5523 15 14 15.4477 14 16V20C14 20.5523 14.4477 21 15 21M9 21H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Início</span>
+                </a>
+                <a href="/create" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Criar</span>
+                </a>
+                <a href="/upload" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M17 8L12 3L7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Upload</span>
+                </a>
+                <a href="/validate" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.7088 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4905 2.02168 11.3363C2.16356 9.18203 2.99721 7.13214 4.39828 5.49883C5.79935 3.86553 7.69279 2.72636 9.79619 2.24223C11.8996 1.75809 14.1003 1.95185 16.07 2.79" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Validar</span>
+                </a>
+                <a href="/view" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Visualizar</span>
+                </a>
+                <a href="/export" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Exportar</span>
+                </a>
+            </nav>
+            <div class="mobile-menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
+    </header>
 
-        <div class="form-group" style="margin-top: 2rem;">
-            <button type="submit" class="btn btn-primary">
-                <span>📤</span>
-                Upload and Process
-            </button>
-            <a href="/" class="btn btn-outline" style="margin-left: 1rem;">
-                <span>↩️</span>
-                Back to Home
-            </a>
+    <main class="main-content fade-in">
+        {{if .Error}}
+        <div class="notification error">
+            <div class="notification-icon">
+                <svg class="icon icon--error" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M15 9L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M9 9L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="notification-content">
+                <div class="notification-title">Erro</div>
+                <div class="notification-message">{{.Error}}</div>
+            </div>
         </div>
-    </form>
-</div>
+        {{end}}
 
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">📋 File Requirements</h2>
-    </div>
-
-    <div class="grid grid-cols-2">
-        <div>
-            <h3 class="feature-title">📁 Supported Formats</h3>
-            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
-                <li><strong>.txt</strong> - Standard text files</li>
-                <li><strong>.ach</strong> - ACH format files</li>
-                <li>Fixed-width 94-character records</li>
-                <li>Standard NACHA formatting</li>
-            </ul>
+        {{if .Message}}
+        <div class="notification success">
+            <div class="notification-icon">
+                <svg class="icon icon--success" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="notification-content">
+                <div class="notification-title">Sucesso</div>
+                <div class="notification-message">{{.Message}}</div>
+            </div>
         </div>
+        {{end}}
 
-        <div>
-            <h3 class="feature-title">✅ Validation Checks</h3>
-            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
-                <li>Record length validation</li>
-                <li>Field format validation</li>
-                <li>Amount calculations</li>
-                <li>Control totals verification</li>
-            </ul>
+        <div class="container">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">📤 Upload de Arquivo NACHA</h1>
+                    <p class="card-subtitle">
+                        Carregue um arquivo NACHA existente para processamento, validação e análise. 
+                        Formatos aceitos: .ach, .nacha, .txt ou qualquer arquivo de texto com formato NACHA.
+                    </p>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" class="upload-form">
+                    <div class="upload-section">
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <div class="upload-icon">📁</div>
+                            <h3 class="upload-title">Arraste seu arquivo aqui</h3>
+                            <p class="upload-subtitle">ou clique para selecionar</p>
+                            <input type="file" id="file" name="file" class="file-input" accept=".ach,.nacha,.txt,text/*" required>
+                            <div class="upload-info">
+                                <span class="info-item">
+                                    <span class="info-icon">📋</span>
+                                    Formatos: .ach, .nacha, .txt
+                                </span>
+                                <span class="info-item">
+                                    <span class="info-icon">📏</span>
+                                    Tamanho máximo: 10MB
+                                </span>
+                                <span class="info-item">
+                                    <span class="info-icon">✅</span>
+                                    Validação automática
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="selected-file" id="selectedFile" style="display: none;">
+                            <div class="file-preview">
+                                <span class="file-icon">📄</span>
+                                <div class="file-details">
+                                    <div class="file-name" id="fileName"></div>
+                                    <div class="file-size" id="fileSize"></div>
+                                </div>
+                                <button type="button" class="file-remove" id="removeFile">❌</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="upload-options">
+                        <div class="option-group">
+                            <h4 class="option-title">🔧 Opções de Processamento</h4>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="validate" checked>
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Executar validação completa</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="analyze">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Análise detalhada de lotes</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="export_preview">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Gerar preview de exportação</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="uploadBtn" disabled>
+                            <span class="btn-icon">📤</span>
+                            <span class="btn-text">Processar Arquivo</span>
+                            <span class="loading-spinner" style="display: none;">⏳</span>
+                        </button>
+                        <a href="/" class="btn btn-secondary">
+                            <span class="btn-icon">🏠</span>
+                            <span class="btn-text">Voltar ao Início</span>
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="info-cards">
+                <div class="info-card">
+                    <div class="info-header">
+                        <span class="info-icon">ℹ️</span>
+                        <h3 class="info-title">Como Funciona</h3>
+                    </div>
+                    <div class="info-content">
+                        <ol class="process-steps">
+                            <li>Selecione ou arraste um arquivo NACHA</li>
+                            <li>Configure as opções de processamento</li>
+                            <li>Clique em "Processar Arquivo"</li>
+                            <li>Visualize os resultados e validações</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-header">
+                        <span class="info-icon">🔍</span>
+                        <h3 class="info-title">O que Verificamos</h3>
+                    </div>
+                    <div class="info-content">
+                        <ul class="validation-list">
+                            <li>✅ Estrutura de registros NACHA</li>
+                            <li>✅ Códigos de transação válidos</li>
+                            <li>✅ Somas de controle e totais</li>
+                            <li>✅ Formatação de campos</li>
+                            <li>✅ Consistência de lotes</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-header">
+                        <span class="info-icon">📊</span>
+                        <h3 class="info-title">Após o Upload</h3>
+                    </div>
+                    <div class="info-content">
+                        <ul class="features-list">
+                            <li>🔍 Visualização detalhada do conteúdo</li>
+                            <li>📋 Relatório de validação completo</li>
+                            <li>💾 Exportação em múltiplos formatos</li>
+                            <li>🔎 Busca por transações específicas</li>
+                            <li>📈 Análise estatística dos dados</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
+    </main>
 
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">🔄 Processing Flow</h2>
-    </div>
-
-    <div class="grid grid-cols-3">
-        <div class="feature-card" style="cursor: default; transform: none;">
-            <span class="feature-icon">1️⃣</span>
-            <h3 class="feature-title">Upload</h3>
-            <p class="feature-desc">File is uploaded and parsed</p>
-        </div>
-
-        <div class="feature-card" style="cursor: default; transform: none;">
-            <span class="feature-icon">2️⃣</span>
-            <h3 class="feature-title">Validate</h3>
-            <p class="feature-desc">Automatic validation against NACHA rules</p>
-        </div>
-
-        <div class="feature-card" style="cursor: default; transform: none;">
-            <span class="feature-icon">3️⃣</span>
-            <h3 class="feature-title">Results</h3>
-            <p class="feature-desc">View validation results and options</p>
-        </div>
-    </div>
-</div>
-
-<script>
-document.getElementById('file-input').addEventListener('change', function(e) {
-    const fileName = e.target.files[0]?.name;
-    if (fileName) {
-        const uploadArea = document.querySelector('.file-upload');
-        uploadArea.style.borderColor = 'var(--success-color)';
-        uploadArea.style.background = 'rgba(16, 185, 129, 0.05)';
-        
-        const icon = document.querySelector('.file-upload-icon');
-        icon.textContent = '✅';
-        
-        const text = uploadArea.querySelector('h3');
-        text.textContent = `Selected: ${fileName}`;
+    <style>
+    .upload-form {
+        max-width: 800px;
+        margin: 0 auto;
     }
-});
-</script>
-{{end}} 
+
+    .upload-section {
+        margin-bottom: 3rem;
+    }
+
+    .file-upload-area {
+        border: 2px dashed var(--border-color);
+        border-radius: var(--border-radius-lg);
+        padding: 4rem 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        background: var(--glass-background);
+        backdrop-filter: blur(10px);
+        position: relative;
+    }
+
+    .file-upload-area:hover {
+        border-color: var(--primary-color);
+        background: var(--glass-border);
+        transform: translateY(-2px);
+    }
+
+    .file-upload-area.dragover {
+        border-color: var(--primary-color);
+        background: var(--input-focus);
+        transform: scale(1.02);
+    }
+
+    .upload-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        display: block;
+        filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.3));
+    }
+
+    .upload-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    .upload-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .file-input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .upload-info {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+        margin-top: 1.5rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .info-icon {
+        font-size: 1rem;
+    }
+
+    .selected-file {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: var(--card-background);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        backdrop-filter: blur(20px);
+    }
+
+    .file-preview {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .file-icon {
+        font-size: 2rem;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+    }
+
+    .file-details {
+        flex-grow: 1;
+    }
+
+    .file-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .file-size {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .file-remove {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 0.5rem;
+        border-radius: 50%;
+        transition: all var(--transition-normal);
+    }
+
+    .file-remove:hover {
+        background: var(--error-color);
+        transform: scale(1.1);
+    }
+
+    .upload-options {
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: var(--glass-background);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        backdrop-filter: blur(10px);
+    }
+
+    .option-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        padding: 0.75rem;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .checkbox-label:hover {
+        background: var(--glass-border);
+    }
+
+    .checkbox-label input[type="checkbox"] {
+        display: none;
+    }
+
+    .checkmark {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border-color);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition-normal);
+        background: var(--input-background);
+    }
+
+    .checkbox-label input[type="checkbox"]:checked + .checkmark {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+        content: "✓";
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .checkbox-text {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-icon {
+        font-size: 1.1rem;
+    }
+
+    .btn-text {
+        font-weight: 600;
+    }
+
+    .loading-spinner {
+        font-size: 1.1rem;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+    .btn-secondary {
+        background: var(--glass-background);
+        color: var(--text-primary);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(20px);
+    }
+
+    .btn-secondary:hover {
+        background: var(--glass-border);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+
+    .info-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 4rem;
+    }
+
+    .info-card {
+        background: var(--glass-background);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius-lg);
+        padding: 2rem;
+        transition: all var(--transition-normal);
+    }
+
+    .info-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .info-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-header .info-icon {
+        font-size: 1.5rem;
+    }
+
+    .info-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .info-content {
+        color: var(--text-secondary);
+    }
+
+    .process-steps,
+    .validation-list,
+    .features-list {
+        margin: 0;
+        padding-left: 1.5rem;
+    }
+
+    .process-steps li,
+    .validation-list li,
+    .features-list li {
+        margin-bottom: 0.75rem;
+        line-height: 1.5;
+    }
+
+    .validation-list,
+    .features-list {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .validation-list li,
+    .features-list li {
+        padding-left: 1.5rem;
+        position: relative;
+    }
+
+    @media (max-width: 768px) {
+        .upload-info {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .file-upload-area {
+            padding: 3rem 1.5rem;
+        }
+        
+        .upload-options {
+            padding: 1.5rem;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .info-cards {
+            grid-template-columns: 1fr;
+        }
+    }
+    </style>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const fileInput = document.getElementById('file');
+        const selectedFile = document.getElementById('selectedFile');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const removeFile = document.getElementById('removeFile');
+        const uploadBtn = document.getElementById('uploadBtn');
+
+        // File drag and drop
+        fileUploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.add('dragover');
+        });
+
+        fileUploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+        });
+
+        fileUploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelection(files[0]);
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                handleFileSelection(e.target.files[0]);
+            }
+        });
+
+        // Remove file
+        removeFile.addEventListener('click', function() {
+            fileInput.value = '';
+            selectedFile.style.display = 'none';
+            fileUploadArea.style.display = 'block';
+            uploadBtn.disabled = true;
+        });
+
+        function handleFileSelection(file) {
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            selectedFile.style.display = 'block';
+            fileUploadArea.style.display = 'none';
+            uploadBtn.disabled = false;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Form submission
+        document.querySelector('.upload-form').addEventListener('submit', function() {
+            uploadBtn.querySelector('.btn-text').textContent = 'Processando...';
+            uploadBtn.querySelector('.loading-spinner').style.display = 'inline-block';
+            uploadBtn.disabled = true;
+        });
+    });
+    </script>
+</body>
+</html> 

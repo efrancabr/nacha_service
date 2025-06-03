@@ -2,22 +2,22 @@
 <div class="card">
     <div class="card-header">
         <h1 class="card-title">
-            {{if .Data.IsValid}}✅{{else}}❌{{end}} Validation Results
+            {{if and .Data .Data.IsValid}}✅{{else}}❌{{end}} Validation Results
         </h1>
-        <p class="card-subtitle">{{.Data.Message}}</p>
+        <p class="card-subtitle">{{if .Data}}{{.Data.Message}}{{end}}</p>
     </div>
 
-    {{if .Data.IsValid}}
+    {{if and .Data .Data.IsValid}}
     <div class="message message-success">
         <strong>✅ File is Valid!</strong> Your NACHA file passed all validation checks.
     </div>
-    {{else}}
+    {{else if .Data}}
     <div class="message message-error">
         <strong>❌ Validation Failed</strong> The file contains errors that need to be corrected.
     </div>
     {{end}}
 
-    {{if .Data.Errors}}
+    {{if and .Data .Data.Errors}}
     <div class="card">
         <div class="card-header">
             <h2 class="card-title">🔍 Validation Errors</h2>
@@ -36,7 +36,7 @@
             Validate Another File
         </a>
         
-        {{if .Data.IsValid}}
+        {{if and .Data .Data.IsValid}}
         <a href="/view" class="btn btn-success">
             <span>👁️</span>
             View File Content
@@ -50,7 +50,7 @@
     </div>
 </div>
 
-{{if .Data.IsValid}}
+{{if and .Data .Data.IsValid}}
 <div class="card">
     <div class="card-header">
         <h2 class="card-title">🎉 Next Steps</h2>

@@ -1,139 +1,183 @@
 {{define "content"}}
-<div class="card">
-    <div class="card-header">
-        <h1 class="card-title">🏦 NACHA File Processor</h1>
-        <p class="card-subtitle">
-            Professional NACHA (Automated Clearing House) file processing system with validation, 
-            viewing, and export capabilities. Handle ACH transactions with confidence and compliance.
+<div class="hero">
+    <div class="hero-content">
+        <h1 class="hero-title">Processador NACHA Profissional</h1>
+        <p class="hero-subtitle">
+            Sistema completo para criação, validação e processamento de arquivos NACHA (ACH) 
+            com interface moderna e recursos avançados de análise.
         </p>
-    </div>
-
-    <div class="grid grid-cols-3">
-        <a href="/create" class="feature-card">
-            <span class="feature-icon">📝</span>
-            <h3 class="feature-title">Create Files</h3>
-            <p class="feature-desc">Generate new NACHA files with batch headers, entry details, and proper formatting</p>
-        </a>
-
-        <a href="/upload" class="feature-card">
-            <span class="feature-icon">📤</span>
-            <h3 class="feature-title">Upload & Process</h3>
-            <p class="feature-desc">Upload existing NACHA files for validation and processing</p>
-        </a>
-
-        <a href="/validate" class="feature-card">
-            <span class="feature-icon">✅</span>
-            <h3 class="feature-title">Validate Files</h3>
-            <p class="feature-desc">Comprehensive validation against NACHA standards and rules</p>
-        </a>
-
-        <a href="/view" class="feature-card">
-            <span class="feature-icon">👁️</span>
-            <h3 class="feature-title">View Content</h3>
-            <p class="feature-desc">Detailed file content viewer with batch and entry analysis</p>
-        </a>
-
-        <a href="/export" class="feature-card">
-            <span class="feature-icon">💾</span>
-            <h3 class="feature-title">Export Data</h3>
-            <p class="feature-desc">Export to multiple formats: JSON, CSV, HTML, PDF, SQL, Parquet</p>
-        </a>
-
-        <a href="/details" class="feature-card">
-            <span class="feature-icon">🔍</span>
-            <h3 class="feature-title">Transaction Details</h3>
-            <p class="feature-desc">Look up specific transactions by trace number</p>
-        </a>
+        
+        {{if .CurrentSession}}
+        <div class="session-info">
+            <div class="session-header">
+                <svg class="icon icon--success" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Arquivo ativo: <strong>{{.CurrentSession.FileName}}</strong></span>
+            </div>
+            <div class="session-actions">
+                <a href="/validate" class="btn btn-sm btn-primary">Validar</a>
+                <a href="/view" class="btn btn-sm btn-secondary">Visualizar</a>
+                <a href="/export" class="btn btn-sm btn-success">Exportar</a>
+            </div>
+        </div>
+        {{end}}
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">📊 System Features</h2>
+<div class="features-grid">
+    <div class="feature-card">
+        <div class="feature-header">
+            <span class="feature-icon">
+                <svg class="icon icon--primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            <h3 class="feature-title">Criar Arquivos</h3>
+        </div>
+        <p class="feature-description">
+            Crie arquivos NACHA completos com assistente intuitivo. 
+            Configure cabeçalhos, lotes e transações com validação em tempo real.
+        </p>
+        <a href="/create" class="feature-link">Começar →</a>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value">7</div>
-            <div class="stat-label">Export Formats</div>
+    <div class="feature-card">
+        <div class="feature-header">
+            <span class="feature-icon">
+                <svg class="icon icon--info" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M17 8L12 3L7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            <h3 class="feature-title">Upload de Arquivos</h3>
         </div>
-        <div class="stat-card">
-            <div class="stat-value">5</div>
-            <div class="stat-label">Core Services</div>
+        <p class="feature-description">
+            Carregue arquivos NACHA existentes com suporte a drag-and-drop. 
+            Análise automática e validação completa após upload.
+        </p>
+        <a href="/upload" class="feature-link">Fazer Upload →</a>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-header">
+            <span class="feature-icon">
+                <svg class="icon icon--success" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.7088 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4905 2.02168 11.3363C2.16356 9.18203 2.99721 7.13214 4.39828 5.49883C5.79935 3.86553 7.69279 2.72636 9.79619 2.24223C11.8996 1.75809 14.1003 1.95185 16.07 2.79" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            <h3 class="feature-title">Validação</h3>
         </div>
-        <div class="stat-card">
-            <div class="stat-value">100%</div>
-            <div class="stat-label">NACHA Compliant</div>
+        <p class="feature-description">
+            Validação completa contra especificações NACHA oficiais. 
+            Verificação de formato, códigos e integridade dos dados.
+        </p>
+        <a href="/validate" class="feature-link">Validar →</a>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-header">
+            <span class="feature-icon">
+                <svg class="icon icon--warning" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            <h3 class="feature-title">Visualização</h3>
         </div>
-        <div class="stat-card">
-            <div class="stat-value">gRPC</div>
-            <div class="stat-label">API Technology</div>
+        <p class="feature-description">
+            Visualize estrutura e conteúdo dos arquivos NACHA de forma organizada. 
+            Navegue por cabeçalhos, lotes e entradas facilmente.
+        </p>
+        <a href="/view" class="feature-link">Visualizar →</a>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-header">
+            <span class="feature-icon">
+                <svg class="icon icon--primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            <h3 class="feature-title">Exportação</h3>
         </div>
+        <p class="feature-description">
+            Exporte dados em múltiplos formatos: JSON, CSV, HTML, PDF, SQL, TXT e Parquet. 
+            Formatação profissional para relatórios e análises.
+        </p>
+        <a href="/export" class="feature-link">Exportar →</a>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-header">
+            <span class="feature-icon">
+                <svg class="icon icon--info" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            <h3 class="feature-title">Buscar Transações</h3>
+        </div>
+        <p class="feature-description">
+            Encontre transações específicas por número de rastreamento. 
+            Visualize detalhes completos e informações bancárias.
+        </p>
+        <a href="/details" class="feature-link">Buscar →</a>
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">🚀 Quick Start</h2>
-        <p class="card-subtitle">Get started with NACHA file processing in three simple steps</p>
-    </div>
-
-    <div class="grid grid-cols-3">
-        <div class="feature-card">
-            <span class="feature-icon">1️⃣</span>
-            <h3 class="feature-title">Create or Upload</h3>
-            <p class="feature-desc">Start by creating a new NACHA file or uploading an existing one</p>
+<div class="info-section">
+    <div class="info-cards">
+        <div class="info-card">
+            <div class="info-header">
+                <span class="format-icon">
+                    <svg class="icon icon--primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9 9L12 6L16 10L22 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <h3 class="info-title">Formatos Suportados</h3>
+            </div>
+            <div class="info-content">
+                <ul class="format-list">
+                    <li><strong>JSON</strong> - Estrutura de dados legível</li>
+                    <li><strong>CSV</strong> - Planilhas e análises</li>
+                    <li><strong>HTML</strong> - Relatórios web</li>
+                    <li><strong>PDF</strong> - Documentos profissionais</li>
+                    <li><strong>SQL</strong> - Importação para bancos</li>
+                    <li><strong>TXT</strong> - Formato original NACHA</li>
+                    <li><strong>Parquet</strong> - Big Data e Analytics</li>
+                </ul>
+            </div>
         </div>
 
-        <div class="feature-card">
-            <span class="feature-icon">2️⃣</span>
-            <h3 class="feature-title">Validate & View</h3>
-            <p class="feature-desc">Ensure compliance with NACHA standards and review file contents</p>
-        </div>
-
-        <div class="feature-card">
-            <span class="feature-icon">3️⃣</span>
-            <h3 class="feature-title">Export & Use</h3>
-            <p class="feature-desc">Export to your preferred format and integrate with your systems</p>
-        </div>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">🔧 Technical Information</h2>
-    </div>
-
-    <div class="grid grid-cols-2">
-        <div>
-            <h3 class="feature-title">🏗️ Architecture</h3>
-            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
-                <li>gRPC backend service (port 50051)</li>
-                <li>Modern web frontend (port 8080)</li>
-                <li>Go-based implementation</li>
-                <li>Comprehensive validation engine</li>
-            </ul>
-        </div>
-
-        <div>
-            <h3 class="feature-title">📁 Supported Formats</h3>
-            <div class="export-formats" style="margin-top: 0.5rem;">
-                <div class="format-btn" style="cursor: default; transform: none;">
-                    <span class="format-icon">📄</span>
-                    JSON
-                </div>
-                <div class="format-btn" style="cursor: default; transform: none;">
-                    <span class="format-icon">📊</span>
-                    CSV
-                </div>
-                <div class="format-btn" style="cursor: default; transform: none;">
-                    <span class="format-icon">🌐</span>
-                    HTML
-                </div>
-                <div class="format-btn" style="cursor: default; transform: none;">
-                    <span class="format-icon">📋</span>
-                    PDF
-                </div>
+        <div class="info-card">
+            <div class="info-header">
+                <span class="format-icon">
+                    <svg class="icon icon--success" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <h3 class="info-title">Recursos Técnicos</h3>
+            </div>
+            <div class="info-content">
+                <ul class="tech-list">
+                    <li>Validação completa NACHA</li>
+                    <li>Interface moderna e responsiva</li>
+                    <li>Processamento em tempo real</li>
+                    <li>Gerenciamento de sessão</li>
+                    <li>Upload drag-and-drop</li>
+                    <li>Análise automática de arquivos</li>
+                    <li>Suporte a múltiplos formatos</li>
+                </ul>
             </div>
         </div>
     </div>

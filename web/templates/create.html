@@ -1,107 +1,370 @@
-{{define "content"}}
-<div class="card">
-    <div class="card-header">
-        <h1 class="card-title">📝 Create NACHA File</h1>
-        <p class="card-subtitle">Generate a new NACHA file with batch headers and entry details</p>
-    </div>
-
-    <form method="POST" action="/create">
-        <div class="grid grid-cols-2">
-            <div class="form-group">
-                <label for="immediate_destination" class="form-label">Immediate Destination</label>
-                <input type="text" id="immediate_destination" name="immediate_destination" 
-                       class="form-input" placeholder="123456789" maxlength="9" required>
-                <small style="color: var(--text-secondary);">9-digit routing number of receiving bank</small>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}} - Processador NACHA</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+    <meta name="description" content="Sistema profissional de processamento de arquivos NACHA com validação e exportação">
+    <meta name="keywords" content="NACHA, ACH, processamento, arquivos, validação, exportação">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">
+                    <svg class="icon icon--primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="logo-text">Processador NACHA</span>
             </div>
-
-            <div class="form-group">
-                <label for="immediate_origin" class="form-label">Immediate Origin</label>
-                <input type="text" id="immediate_origin" name="immediate_origin" 
-                       class="form-input" placeholder="987654321" maxlength="9" required>
-                <small style="color: var(--text-secondary);">9-digit routing number of originating bank</small>
-            </div>
-
-            <div class="form-group">
-                <label for="company_name" class="form-label">Company Name</label>
-                <input type="text" id="company_name" name="company_name" 
-                       class="form-input" placeholder="TEST COMPANY" maxlength="16" required>
-                <small style="color: var(--text-secondary);">Name of the company originating the ACH</small>
-            </div>
-
-            <div class="form-group">
-                <label for="company_id" class="form-label">Company ID</label>
-                <input type="text" id="company_id" name="company_id" 
-                       class="form-input" placeholder="1234567890" maxlength="10" required>
-                <small style="color: var(--text-secondary);">Company identification number</small>
-            </div>
-
-            <div class="form-group">
-                <label for="amount" class="form-label">Amount (in cents)</label>
-                <input type="number" id="amount" name="amount" 
-                       class="form-input" placeholder="123400" min="1" required>
-                <small style="color: var(--text-secondary);">Amount in cents (e.g., 123400 = $1,234.00)</small>
-            </div>
-
-            <div class="form-group">
-                <label for="receiving_dfi" class="form-label">Receiving DFI</label>
-                <input type="text" id="receiving_dfi" name="receiving_dfi" 
-                       class="form-input" placeholder="12345678" maxlength="8" required>
-                <small style="color: var(--text-secondary);">8-digit routing number of receiving bank</small>
-            </div>
-
-            <div class="form-group">
-                <label for="account_number" class="form-label">Account Number</label>
-                <input type="text" id="account_number" name="account_number" 
-                       class="form-input" placeholder="123456789" maxlength="17" required>
-                <small style="color: var(--text-secondary);">Recipient's account number</small>
-            </div>
-
-            <div class="form-group">
-                <label for="individual_name" class="form-label">Individual Name</label>
-                <input type="text" id="individual_name" name="individual_name" 
-                       class="form-input" placeholder="JOHN DOE" maxlength="22" required>
-                <small style="color: var(--text-secondary);">Name of the account holder</small>
+            <nav class="nav">
+                <a href="/" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 12L5 10M5 10L12 3L19 10M5 10V20C5 20.5523 5.44772 21 6 21H9M19 10L21 12M19 10V20C19 20.5523 18.5523 21 18 21H15M9 21C9.55228 21 10 20.5523 10 20V16C10 15.4477 10.4477 15 11 15H13C13.5523 15 14 15.4477 14 16V20C14 20.5523 14.4477 21 15 21M9 21H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Início</span>
+                </a>
+                <a href="/create" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Criar</span>
+                </a>
+                <a href="/upload" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M17 8L12 3L7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Upload</span>
+                </a>
+                <a href="/validate" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.7088 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4905 2.02168 11.3363C2.16356 9.18203 2.99721 7.13214 4.39828 5.49883C5.79935 3.86553 7.69279 2.72636 9.79619 2.24223C11.8996 1.75809 14.1003 1.95185 16.07 2.79" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Validar</span>
+                </a>
+                <a href="/view" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Visualizar</span>
+                </a>
+                <a href="/export" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Exportar</span>
+                </a>
+            </nav>
+            <div class="mobile-menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </div>
+    </header>
 
-        <div class="form-group" style="margin-top: 2rem;">
-            <button type="submit" class="btn btn-primary">
-                <span>📝</span>
-                Create NACHA File
-            </button>
-            <a href="/" class="btn btn-outline" style="margin-left: 1rem;">
-                <span>↩️</span>
-                Back to Home
-            </a>
+    <main class="main-content fade-in">
+        {{if .Error}}
+        <div class="notification error">
+            <div class="notification-icon">
+                <svg class="icon icon--error" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M15 9L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M9 9L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="notification-content">
+                <div class="notification-title">Erro</div>
+                <div class="notification-message">{{.Error}}</div>
+            </div>
         </div>
-    </form>
-</div>
+        {{end}}
 
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">💡 Tips for Creating NACHA Files</h2>
-    </div>
-
-    <div class="grid grid-cols-2">
-        <div>
-            <h3 class="feature-title">🏦 Routing Numbers</h3>
-            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
-                <li>Must be exactly 9 digits</li>
-                <li>Use valid ABA routing numbers</li>
-                <li>Destination: receiving bank</li>
-                <li>Origin: your bank</li>
-            </ul>
+        {{if .Message}}
+        <div class="notification success">
+            <div class="notification-icon">
+                <svg class="icon icon--success" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="notification-content">
+                <div class="notification-title">Sucesso</div>
+                <div class="notification-message">{{.Message}}</div>
+            </div>
         </div>
+        {{end}}
 
-        <div>
-            <h3 class="feature-title">💰 Amount Format</h3>
-            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-top: 0.5rem;">
-                <li>Enter amounts in cents</li>
-                <li>$1.00 = 100 cents</li>
-                <li>$1,234.56 = 123456 cents</li>
-                <li>No decimal points needed</li>
-            </ul>
+        <div class="container">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">📝 Criar Arquivo NACHA</h1>
+                    <p class="card-subtitle">
+                        Gere um novo arquivo NACHA com informações personalizadas de lote e transação. 
+                        Preencha os campos abaixo para criar um arquivo conforme os padrões ACH.
+                    </p>
+                </div>
+
+                <form method="post" class="nacha-form">
+                    <div class="form-section">
+                        <h3 class="form-section-title">🏦 Informações do Cabeçalho</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="immediate_destination" class="form-label">Destino Imediato</label>
+                                <input type="text" id="immediate_destination" name="immediate_destination" 
+                                       class="form-input" value="123456789" maxlength="10"
+                                       placeholder="Ex: 123456789" required>
+                                <small class="form-help">Número de roteamento do banco de destino</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="immediate_origin" class="form-label">Origem Imediata</label>
+                                <input type="text" id="immediate_origin" name="immediate_origin" 
+                                       class="form-input" value="987654321" maxlength="10"
+                                       placeholder="Ex: 987654321" required>
+                                <small class="form-help">Número de roteamento do banco de origem</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="file_id_modifier" class="form-label">Modificador de ID do Arquivo</label>
+                                <input type="text" id="file_id_modifier" name="file_id_modifier" 
+                                       class="form-input" value="A" maxlength="1"
+                                       placeholder="A-Z" required>
+                                <small class="form-help">Caractere único para identificar o arquivo</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title">📊 Informações do Lote</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="company_name" class="form-label">Nome da Empresa</label>
+                                <input type="text" id="company_name" name="company_name" 
+                                       class="form-input" value="EMPRESA EXEMPLO LTDA" maxlength="16"
+                                       placeholder="Nome da sua empresa" required>
+                                <small class="form-help">Nome da empresa que origina as transações</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="company_identification" class="form-label">ID da Empresa</label>
+                                <input type="text" id="company_identification" name="company_identification" 
+                                       class="form-input" value="1234567890" maxlength="10"
+                                       placeholder="Ex: 1234567890" required>
+                                <small class="form-help">Número de identificação fiscal da empresa</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="standard_entry_class" class="form-label">Classe de Entrada</label>
+                                <select id="standard_entry_class" name="standard_entry_class" class="form-select" required>
+                                    <option value="PPD" selected>PPD - Débito/Crédito de Pessoa Física</option>
+                                    <option value="CCD">CCD - Débito/Crédito Corporativo</option>
+                                    <option value="WEB">WEB - Transação pela Internet</option>
+                                    <option value="TEL">TEL - Transação por Telefone</option>
+                                    <option value="CTX">CTX - Transferência de Dados Corporativos</option>
+                                </select>
+                                <small class="form-help">Tipo de transação ACH</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="company_entry_description" class="form-label">Descrição da Entrada</label>
+                                <input type="text" id="company_entry_description" name="company_entry_description" 
+                                       class="form-input" value="PAYROLL" maxlength="10"
+                                       placeholder="Ex: PAYROLL, PAYMENT" required>
+                                <small class="form-help">Descrição do propósito das transações</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="odfi_identification" class="form-label">ID da Instituição Financeira</label>
+                                <input type="text" id="odfi_identification" name="odfi_identification" 
+                                       class="form-input" value="12345678" maxlength="8"
+                                       placeholder="Ex: 12345678" required>
+                                <small class="form-help">Identificação da instituição financeira originadora</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title">💰 Detalhes da Transação</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="transaction_code" class="form-label">Código da Transação</label>
+                                <select id="transaction_code" name="transaction_code" class="form-select" required>
+                                    <option value="22" selected>22 - Crédito em Conta Corrente</option>
+                                    <option value="23">23 - Crédito Pré-autorizado (Conta Corrente)</option>
+                                    <option value="27">27 - Débito em Conta Corrente</option>
+                                    <option value="28">28 - Débito Pré-autorizado (Conta Corrente)</option>
+                                    <option value="32">32 - Crédito em Conta Poupança</option>
+                                    <option value="33">33 - Crédito Pré-autorizado (Poupança)</option>
+                                    <option value="37">37 - Débito em Conta Poupança</option>
+                                    <option value="38">38 - Débito Pré-autorizado (Poupança)</option>
+                                </select>
+                                <small class="form-help">Tipo específico de transação bancária</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="receiving_dfi_identification" class="form-label">Banco Receptor</label>
+                                <input type="text" id="receiving_dfi_identification" name="receiving_dfi_identification" 
+                                       class="form-input" value="12345678" maxlength="8"
+                                       placeholder="Ex: 12345678" required>
+                                <small class="form-help">Número de roteamento do banco receptor</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="dfi_account_number" class="form-label">Número da Conta</label>
+                                <input type="text" id="dfi_account_number" name="dfi_account_number" 
+                                       class="form-input" value="987654321098765" maxlength="17"
+                                       placeholder="Número da conta do beneficiário" required>
+                                <small class="form-help">Conta bancária que receberá/enviará os fundos</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="amount" class="form-label">Valor (em centavos)</label>
+                                <input type="number" id="amount" name="amount" 
+                                       class="form-input" value="123400" min="1"
+                                       placeholder="Ex: 123400 (para R$ 1.234,00)" required>
+                                <small class="form-help">Valor em centavos (123400 = R$ 1.234,00)</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="individual_identification_number" class="form-label">CPF/CNPJ do Beneficiário</label>
+                                <input type="text" id="individual_identification_number" name="individual_identification_number" 
+                                       class="form-input" value="12345678901" maxlength="15"
+                                       placeholder="Ex: 12345678901" required>
+                                <small class="form-help">Documento de identificação do beneficiário</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="individual_name" class="form-label">Nome do Beneficiário</label>
+                                <input type="text" id="individual_name" name="individual_name" 
+                                       class="form-input" value="JOAO DA SILVA" maxlength="22"
+                                       placeholder="Nome completo" required>
+                                <small class="form-help">Nome da pessoa ou empresa beneficiária</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="btn-icon">🔧</span>
+                            <span class="btn-text">Gerar Arquivo NACHA</span>
+                        </button>
+                        <a href="/" class="btn btn-secondary">
+                            <span class="btn-icon">↩️</span>
+                            <span class="btn-text">Voltar ao Início</span>
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-</div>
-{{end}} 
+    </main>
+
+    <style>
+    .form-section {
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: var(--glass-background);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        backdrop-filter: blur(10px);
+    }
+
+    .form-section-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .form-help {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-style: italic;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 3rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-icon {
+        font-size: 1.1rem;
+    }
+
+    .btn-text {
+        font-weight: 600;
+    }
+
+    .btn-secondary {
+        background: var(--glass-background);
+        color: var(--text-primary);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(20px);
+    }
+
+    .btn-secondary:hover {
+        background: var(--glass-border);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-section {
+            padding: 1.5rem;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+    </style>
+</body>
+</html> 
