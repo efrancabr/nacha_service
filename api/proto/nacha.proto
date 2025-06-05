@@ -13,6 +13,9 @@ service NachaService {
     // Export NACHA file to different formats
     rpc ExportFile(ExportRequest) returns (ExportResponse) {}
     
+    // Import JSON to NACHA format
+    rpc ImportFromJson(ImportRequest) returns (FileResponse) {}
+    
     // View complete file details
     rpc ViewFile(FileRequest) returns (FileDetailsResponse) {}
     
@@ -191,4 +194,8 @@ message EntryDetail {
     string addenda_record_indicator = 9;
     string trace_number = 10;
     repeated AddendaRecord addenda_records = 11;
+}
+
+message ImportRequest {
+    bytes json_content = 1;
 } 

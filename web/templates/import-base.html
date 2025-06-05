@@ -57,6 +57,17 @@
                     </span>
                     <span class="nav-text">Upload</span>
                 </a>
+                <a href="/import" class="nav-link">
+                    <span class="nav-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 9L8 13L12 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 13H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-text">Importar</span>
+                </a>
                 <a href="/validate" class="nav-link">
                     <span class="nav-icon">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -126,145 +137,7 @@
         {{end}}
 
         <div class="container">
-            <div class="card">
-                <div class="card-header">
-                    <h1 class="card-title">✅ Validar Arquivo NACHA</h1>
-                    <p class="card-subtitle">
-                        Realize validação completa do arquivo NACHA contra padrões oficiais ACH. 
-                        Verifique estrutura, formatação e integridade dos dados.
-                    </p>
-                </div>
-
-                {{if .CurrentSession}}
-                <div class="session-info">
-                    <div class="session-header">
-                        <span class="session-icon">📁</span>
-                        <div class="session-details">
-                            <h3 class="session-title">Arquivo em Sessão</h3>
-                            <p class="session-filename">{{.CurrentSession.FileName}}</p>
-                            <p class="session-time">Carregado em: {{.CurrentSession.UploadTime.Format "02/01/2006 15:04:05"}}</p>
-                        </div>
-                    </div>
-                    
-                    <form method="post" class="session-form">
-                        <button type="submit" class="btn btn-primary">
-                            <span class="btn-icon">✅</span>
-                            <span class="btn-text">Validar Arquivo da Sessão</span>
-                        </button>
-                    </form>
-                </div>
-
-                <div class="divider">
-                    <span class="divider-text">ou</span>
-                </div>
-                {{end}}
-
-                <form method="post" class="validate-form">
-                    <div class="form-section">
-                        <h3 class="form-section-title">📝 Validar Conteúdo Manual</h3>
-                        <p class="form-section-desc">Cole o conteúdo do arquivo NACHA para validação direta</p>
-                        
-                        <div class="form-group">
-                            <label for="content" class="form-label">Conteúdo do Arquivo NACHA</label>
-                            <textarea id="content" name="content" class="form-textarea" rows="20" 
-                                      placeholder="Cole aqui o conteúdo completo do arquivo NACHA...
-Exemplo:
-101 123456789 987654321241025080414A094101                         
-5220EMPRESA EXEMPLO   1234567890 PPDPAYROLL   24102512345678  1000001
-622123456789876543210987654321  0000123400JOAO SILVA           012345678901000001
-..."
-                                      {{if not .CurrentSession}}required{{end}}>{{if .Data}}{{.Data}}{{end}}</textarea>
-                            <small class="form-help">Formato NACHA padrão com registros de 94 caracteres</small>
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <span class="btn-icon">🔍</span>
-                            <span class="btn-text">Validar Conteúdo</span>
-                        </button>
-                        <a href="/" class="btn btn-secondary">
-                            <span class="btn-icon">🏠</span>
-                            <span class="btn-text">Voltar ao Início</span>
-                        </a>
-                    </div>
-                </form>
-            </div>
-
-            <div class="info-section">
-                <div class="grid grid-cols-3">
-                    <div class="info-card">
-                        <div class="info-header">
-                            <span class="info-icon">🔍</span>
-                            <h3 class="info-title">Validações Realizadas</h3>
-                        </div>
-                        <div class="info-content">
-                            <ul class="validation-list">
-                                <li>✓ Estrutura de registros NACHA</li>
-                                <li>✓ Tamanho de linha (94 caracteres)</li>
-                                <li>✓ Códigos de transação válidos</li>
-                                <li>✓ Formatação de campos</li>
-                                <li>✓ Somas de controle</li>
-                                <li>✓ Consistência de lotes</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="info-card">
-                        <div class="info-header">
-                            <span class="info-icon">📋</span>
-                            <h3 class="info-title">Tipos de Registro</h3>
-                        </div>
-                        <div class="info-content">
-                            <ul class="record-types">
-                                <li><span class="record-code">1</span> Cabeçalho do Arquivo</li>
-                                <li><span class="record-code">5</span> Cabeçalho do Lote</li>
-                                <li><span class="record-code">6</span> Detalhes da Entrada</li>
-                                <li><span class="record-code">8</span> Controle do Lote</li>
-                                <li><span class="record-code">9</span> Controle do Arquivo</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="info-card">
-                        <div class="info-header">
-                            <span class="info-icon">⚠️</span>
-                            <h3 class="info-title">Erros Comuns</h3>
-                        </div>
-                        <div class="info-content">
-                            <ul class="error-list">
-                                <li>🚫 Linhas com tamanho incorreto</li>
-                                <li>🚫 Códigos de transação inválidos</li>
-                                <li>🚫 Campos obrigatórios vazios</li>
-                                <li>🚫 Totais de controle incorretos</li>
-                                <li>🚫 Formatação de datas inválida</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{if .ActiveFiles}}
-            <div class="active-files-section">
-                <h2 class="section-title">📂 Arquivos Ativos na Sessão</h2>
-                <div class="files-grid">
-                    {{range .ActiveFiles}}
-                    <div class="file-card {{if and $.CurrentSession (eq .ID $.CurrentSession.ID)}}active{{end}}">
-                        <div class="file-icon">📄</div>
-                        <div class="file-info">
-                            <h4 class="file-name">{{.FileName}}</h4>
-                            <p class="file-time">{{.UploadTime.Format "02/01 15:04"}}</p>
-                        </div>
-                        {{if not (and $.CurrentSession (eq .ID $.CurrentSession.ID))}}
-                        <a href="/validate?session={{.ID}}" class="file-action">Usar</a>
-                        {{else}}
-                        <span class="file-current">Atual</span>
-                        {{end}}
-                    </div>
-                    {{end}}
-                </div>
-            </div>
-            {{end}}
+            {{template "import-content" .}}
         </div>
     </main>
 
@@ -279,6 +152,7 @@ Exemplo:
                     <h4 class="footer-title">Recursos</h4>
                     <ul class="footer-links">
                         <li><a href="/create">Criar Arquivos</a></li>
+                        <li><a href="/import">Importar JSON</a></li>
                         <li><a href="/validate">Validação</a></li>
                         <li><a href="/export">Exportação</a></li>
                     </ul>

@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"strconv"
@@ -548,4 +549,36 @@ func convertBatchControl(control *models.BatchControl) *pb.BatchControl {
 		OriginatingDfiIdentification: control.OriginatingDFI,
 		BatchNumber:                  control.BatchNumber,
 	}
+}
+
+// ImportFromJson converts a JSON representation of a NACHA file to NACHA format
+func (s *NachaService) ImportFromJson(ctx context.Context, req *pb.FileRequest) (*pb.FileResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "request cannot be nil")
+	}
+	if req.FileContent == nil {
+		return nil, status.Error(codes.InvalidArgument, "JSON content cannot be nil")
+	}
+
+	// Parse the JSON content into a NachaFile struct
+	var nachaFile models.NachaFile
+	if err := json.Unmarshal(req.FileContent, &nachaFile); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "failed to parse JSON: %v", err)
+	}
+
+	// Validate the parsed file structure
+	if err := nachaFile.Validate(); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid NACHA file structure: %v", err)
+	}
+
+	// Convert the NachaFile to NACHA format bytes
+	nachaBytes := nachaFile.ToBytes()
+	if len(nachaBytes) == 0 {
+		return nil, status.Error(codes.Internal, "failed to generate NACHA file content")
+	}
+
+	return &pb.FileResponse{
+		FileContent: nachaBytes,
+		Message:     "JSON successfully converted to NACHA format",
+	}, nil
 }

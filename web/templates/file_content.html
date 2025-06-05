@@ -1,130 +1,164 @@
 {{define "content"}}
-<div class="card">
-    <div class="card-header">
-        <h1 class="card-title">👁️ Conteúdo do Arquivo NACHA</h1>
-        <p class="card-subtitle">Visualização detalhada da estrutura do arquivo, lotes e estatísticas</p>
-    </div>
-</div>
-
-<!-- Cabeçalho do Arquivo -->
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">📄 Informações do Cabeçalho</h2>
-    </div>
-
-    <div class="table-container">
-        <table class="table">
-            <tbody>
-                <tr>
-                    <td><strong>Destino Imediato</strong></td>
-                    <td>{{index .Data.Header "immediate_destination"}}</td>
-                </tr>
-                <tr>
-                    <td><strong>Origem Imediata</strong></td>
-                    <td>{{index .Data.Header "immediate_origin"}}</td>
-                </tr>
-                <tr>
-                    <td><strong>Data de Criação</strong></td>
-                    <td>{{index .Data.Header "file_creation_date"}}</td>
-                </tr>
-                <tr>
-                    <td><strong>Hora de Criação</strong></td>
-                    <td>{{index .Data.Header "file_creation_time"}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Estatísticas do Arquivo -->
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">📊 Estatísticas do Arquivo</h2>
-    </div>
-
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value">{{index .Data.Statistics "total_batches"}}</div>
-            <div class="stat-label">Total de Lotes</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{{index .Data.Statistics "total_entries"}}</div>
-            <div class="stat-label">Total de Entradas</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">R$ {{printf "%.2f" (index .Data.Statistics "total_amount_formatted")}}</div>
-            <div class="stat-label">Valor Total</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{{len .Data.Batches}}</div>
-            <div class="stat-label">Quantidade de Lotes</div>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">👁️ Conteúdo do Arquivo NACHA</h1>
+            <p class="card-subtitle">Visualização detalhada da estrutura do arquivo, lotes e estatísticas</p>
         </div>
     </div>
-</div>
 
-<!-- Informações dos Lotes -->
-{{range $i, $batch := .Data.Batches}}
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">📦 Detalhes do Lote {{add $i 1}}</h2>
+    <!-- Cabeçalho do Arquivo -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">📄 Informações do Cabeçalho</h2>
+        </div>
+
+        <div class="card-body">
+            <div class="table-container">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td><strong>Destino Imediato</strong></td>
+                            <td>{{index .Data.Header "immediate_destination"}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Origem Imediata</strong></td>
+                            <td>{{index .Data.Header "immediate_origin"}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data de Criação</strong></td>
+                            <td>{{index .Data.Header "file_creation_date"}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hora de Criação</strong></td>
+                            <td>{{index .Data.Header "file_creation_time"}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
-    <div class="table-container">
-        <table class="table">
-            <tbody>
-                <tr>
-                    <td><strong>Código da Classe de Serviço</strong></td>
-                    <td>
-                        {{index $batch "service_class_code"}}
-                        <span class="badge badge-info">
-                            {{if eq (index $batch "service_class_code") "220"}}Apenas Créditos
-                            {{else if eq (index $batch "service_class_code") "225"}}Apenas Débitos  
-                            {{else if eq (index $batch "service_class_code") "200"}}Misto
-                            {{else}}Desconhecido{{end}}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>Nome da Empresa</strong></td>
-                    <td>{{index $batch "company_name"}}</td>
-                </tr>
-                <tr>
-                    <td><strong>Contagem de Entradas</strong></td>
-                    <td>{{index $batch "entry_count"}}</td>
-                </tr>
-                <tr>
-                    <td><strong>Hash de Entrada</strong></td>
-                    <td>{{index $batch "entry_hash"}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-{{end}}
+    <!-- Estatísticas do Arquivo -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">📊 Estatísticas do Arquivo</h2>
+        </div>
 
-<div class="action-buttons">
-    <a href="/view" class="btn btn-primary">
-        <span class="btn-icon">🔄</span>
-        <span class="btn-text">Visualizar Outro Arquivo</span>
-    </a>
-    
-    <a href="/export" class="btn btn-success">
-        <span class="btn-icon">💾</span>
-        <span class="btn-text">Exportar Este Arquivo</span>
-    </a>
-    
-    <a href="/details" class="btn btn-secondary">
-        <span class="btn-icon">🔍</span>
-        <span class="btn-text">Detalhes das Transações</span>
-    </a>
-    
-    <a href="/validate" class="btn btn-warning">
-        <span class="btn-icon">✅</span>
-        <span class="btn-text">Validar Arquivo</span>
-    </a>
+        <div class="card-body">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">{{index .Data.Statistics "total_batches"}}</div>
+                    <div class="stat-label">Total de Lotes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{index .Data.Statistics "total_entries"}}</div>
+                    <div class="stat-label">Total de Entradas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">R$ {{printf "%.2f" (index .Data.Statistics "total_amount_formatted")}}</div>
+                    <div class="stat-label">Valor Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{len .Data.Batches}}</div>
+                    <div class="stat-label">Quantidade de Lotes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informações dos Lotes -->
+    {{range $i, $batch := .Data.Batches}}
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">📦 Detalhes do Lote {{add $i 1}}</h2>
+        </div>
+
+        <div class="card-body">
+            <div class="table-container">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td><strong>Código da Classe de Serviço</strong></td>
+                            <td>
+                                {{index $batch "service_class_code"}}
+                                <span class="badge badge-info">
+                                    {{if eq (index $batch "service_class_code") "220"}}Apenas Créditos
+                                    {{else if eq (index $batch "service_class_code") "225"}}Apenas Débitos  
+                                    {{else if eq (index $batch "service_class_code") "200"}}Misto
+                                    {{else}}Desconhecido{{end}}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Nome da Empresa</strong></td>
+                            <td>{{index $batch "company_name"}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Contagem de Entradas</strong></td>
+                            <td>{{index $batch "entry_count"}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hash de Entrada</strong></td>
+                            <td>{{index $batch "entry_hash"}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {{end}}
+
+    <div class="action-buttons">
+        <a href="/view" class="btn btn-primary">
+            <span class="btn-icon">🔄</span>
+            <span class="btn-text">Visualizar Outro Arquivo</span>
+        </a>
+        
+        <a href="/export" class="btn btn-success">
+            <span class="btn-icon">💾</span>
+            <span class="btn-text">Exportar Este Arquivo</span>
+        </a>
+        
+        <a href="/details" class="btn btn-secondary">
+            <span class="btn-icon">🔍</span>
+            <span class="btn-text">Detalhes das Transações</span>
+        </a>
+        
+        <a href="/validate" class="btn btn-warning">
+            <span class="btn-icon">✅</span>
+            <span class="btn-text">Validar Arquivo</span>
+        </a>
+    </div>
 </div>
 
 <style>
+.card-body {
+    padding: 1.5rem;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: top;
+}
+
+.table td:first-child {
+    font-weight: 500;
+    background: var(--background-secondary);
+    width: 30%;
+}
+
 .action-buttons {
     display: flex;
     gap: 1rem;
@@ -134,13 +168,21 @@
 }
 
 .btn-success {
-    background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+    background: var(--success-color);
     color: white;
 }
 
+.btn-success:hover {
+    background: #047857;
+}
+
 .btn-warning {
-    background: linear-gradient(135deg, var(--warning-color) 0%, #d97706 100%);
+    background: var(--warning-color);
     color: white;
+}
+
+.btn-warning:hover {
+    background: #b45309;
 }
 
 .stats-grid {
@@ -151,23 +193,24 @@
 }
 
 .stat-card {
-    background: var(--gradient-secondary);
+    background: var(--surface-color);
     padding: 2rem;
     border-radius: var(--border-radius);
     text-align: center;
     border: 1px solid var(--border-color);
-    transition: all var(--transition-normal);
+    transition: all var(--transition);
+    box-shadow: var(--shadow-sm);
 }
 
 .stat-card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
 }
 
 .stat-value {
     font-size: 2.5rem;
     font-weight: 800;
-    color: var(--primary-light);
+    color: var(--primary-color);
     margin-bottom: 0.5rem;
 }
 
@@ -200,7 +243,7 @@
     }
     
     .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
     }
 }
 </style>

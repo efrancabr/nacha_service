@@ -156,6 +156,8 @@ func parseNachaContent(content string) (*NachaData, error) {
 	var totalBatches int = 0
 
 	for _, line := range lines {
+		// Trim whitespace and check length
+		line = strings.TrimSpace(line)
 		if len(line) < 1 {
 			continue
 		}
@@ -163,12 +165,22 @@ func parseNachaContent(content string) (*NachaData, error) {
 		recordType := line[0:1]
 		switch recordType {
 		case "1": // File Header
-			if len(line) >= 94 {
-				data.Header["immediate_destination"] = strings.TrimSpace(line[3:13])
-				data.Header["immediate_origin"] = strings.TrimSpace(line[13:23])
-				data.Header["file_creation_date"] = strings.TrimSpace(line[23:29])
-				data.Header["file_creation_time"] = strings.TrimSpace(line[29:33])
-				data.Header["file_id_modifier"] = strings.TrimSpace(line[33:34])
+			if len(line) >= 34 { // Reduced from 94 to handle shorter lines
+				if len(line) >= 13 {
+					data.Header["immediate_destination"] = strings.TrimSpace(line[3:min(len(line), 13)])
+				}
+				if len(line) >= 23 {
+					data.Header["immediate_origin"] = strings.TrimSpace(line[13:min(len(line), 23)])
+				}
+				if len(line) >= 29 {
+					data.Header["file_creation_date"] = strings.TrimSpace(line[23:min(len(line), 29)])
+				}
+				if len(line) >= 33 {
+					data.Header["file_creation_time"] = strings.TrimSpace(line[29:min(len(line), 33)])
+				}
+				if len(line) >= 34 {
+					data.Header["file_id_modifier"] = strings.TrimSpace(line[33:min(len(line), 34)])
+				}
 			}
 
 		case "5": // Batch Header
@@ -321,6 +333,63 @@ func init() {
 func renderTemplate(w http.ResponseWriter, tmpl string, data PageData) {
 	// Adicionar arquivos ativos
 	data.ActiveFiles = fileManager.GetActiveFiles()
+
+	// Recarregar templates para desenvolvimento (remover em produção)
+	funcMap := template.FuncMap{
+		"add": func(a, b int) int {
+			return a + b
+		},
+		"div": func(a, b interface{}) float64 {
+			var aVal, bVal float64
+			switch v := a.(type) {
+			case int:
+				aVal = float64(v)
+			case int64:
+				aVal = float64(v)
+			case float64:
+				aVal = v
+			default:
+				aVal = 0
+			}
+			switch v := b.(type) {
+			case int:
+				bVal = float64(v)
+			case int64:
+				bVal = float64(v)
+			case float64:
+				bVal = v
+			default:
+				bVal = 1
+			}
+			if bVal == 0 {
+				return 0
+			}
+			return aVal / bVal
+		},
+		"formatCurrency": func(amount interface{}) string {
+			if val, ok := amount.(float64); ok {
+				return fmt.Sprintf("R$ %.2f", val)
+			}
+			if val, ok := amount.(int64); ok {
+				return fmt.Sprintf("R$ %.2f", float64(val)/100.0)
+			}
+			return "R$ 0,00"
+		},
+		"index": func(m map[string]interface{}, key string) interface{} {
+			return m[key]
+		},
+		"len": func(slice interface{}) int {
+			switch s := slice.(type) {
+			case []map[string]interface{}:
+				return len(s)
+			default:
+				return 0
+			}
+		},
+	}
+
+	// Recarregar templates dinamicamente
+	templates = template.Must(template.New("").Funcs(funcMap).ParseGlob("templates/*.html"))
 
 	err := templates.ExecuteTemplate(w, tmpl, data)
 	if err != nil {
@@ -604,7 +673,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 					Error:          "Conteúdo do arquivo não pode estar vazio",
 					CurrentSession: currentSession,
 				}
-				renderTemplate(w, "view.html", data)
+				renderTemplate(w, "base.html", data)
 				return
 			}
 			response = callClientView(content)
@@ -618,14 +687,14 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 				Data:           viewData,
 				CurrentSession: currentSession,
 			}
-			renderTemplate(w, "file_content.html", data)
+			renderTemplate(w, "base.html", data)
 		} else {
 			data := PageData{
 				Title:          "Visualizar Arquivo",
 				Message:        response,
 				CurrentSession: currentSession,
 			}
-			renderTemplate(w, "view.html", data)
+			renderTemplate(w, "base.html", data)
 		}
 		return
 	}
@@ -634,7 +703,23 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 		Title:          "Visualizar Arquivo",
 		CurrentSession: currentSession,
 	}
-	renderTemplate(w, "view.html", data)
+	renderTemplate(w, "base.html", data)
+}
+
+// Helper function to get map keys
+func getMapKeys(m map[string]interface{}) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 func exportHandler(w http.ResponseWriter, r *http.Request) {
@@ -995,6 +1080,276 @@ INSERT INTO nacha_files (
 		data.Statistics["total_amount_formatted"])
 }
 
+// importHandler converte JSON para formato NACHA
+func importHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		// Mostrar a página de importação
+		renderTemplate(w, "import-base.html", PageData{
+			Title: "Importar JSON para NACHA",
+		})
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Parse do formulário
+	err := r.ParseMultipartForm(10 << 20) // 10MB max
+	if err != nil {
+		renderTemplate(w, "import-base.html", PageData{
+			Title: "Importar JSON para NACHA",
+			Error: "Erro ao processar formulário: " + err.Error(),
+		})
+		return
+	}
+
+	var jsonContent string
+	var filename string
+
+	// Verificar se foi enviado um arquivo
+	file, header, err := r.FormFile("json_file")
+	if err == nil {
+		defer file.Close()
+		filename = header.Filename
+
+		// Ler conteúdo do arquivo
+		content, err := readFileContent(file)
+		if err != nil {
+			renderTemplate(w, "import-base.html", PageData{
+				Title: "Importar JSON para NACHA",
+				Error: "Erro ao ler arquivo: " + err.Error(),
+			})
+			return
+		}
+		jsonContent = content
+	} else {
+		// Usar conteúdo do textarea
+		jsonContent = r.FormValue("json_content")
+		filename = "imported_json.json"
+	}
+
+	// Validar se há conteúdo
+	if strings.TrimSpace(jsonContent) == "" {
+		renderTemplate(w, "import-base.html", PageData{
+			Title: "Importar JSON para NACHA",
+			Error: "Conteúdo JSON não pode estar vazio",
+		})
+		return
+	}
+
+	// Chamar o serviço para converter JSON para NACHA
+	nachaContent := callClientImportJson(jsonContent)
+
+	// Verificar se houve erro na conversão
+	if strings.HasPrefix(nachaContent, "❌") {
+		renderTemplate(w, "import-base.html", PageData{
+			Title: "Importar JSON para NACHA",
+			Error: nachaContent,
+		})
+		return
+	}
+
+	// Verificar se foi solicitada exportação direta
+	exportFile := r.FormValue("export_file")
+	if exportFile == "true" {
+		// Gerar nome do arquivo
+		timestamp := time.Now().Format("20060102_150405")
+		filename := fmt.Sprintf("nacha_converted_%s.ach", timestamp)
+
+		// Definir headers para download
+		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+		w.Header().Set("Content-Type", "text/plain")
+		w.Header().Set("Content-Length", fmt.Sprintf("%d", len(nachaContent)))
+
+		// Enviar o arquivo
+		w.Write([]byte(nachaContent))
+		return
+	}
+
+	// Salvar o arquivo NACHA convertido na sessão
+	session, err := fileManager.SaveFile(filename, nachaContent)
+	if err != nil {
+		renderTemplate(w, "import-base.html", PageData{
+			Title: "Importar JSON para NACHA",
+			Error: "Erro ao salvar arquivo convertido: " + err.Error(),
+		})
+		return
+	}
+
+	// Definir cookie da sessão
+	setSessionCookie(w, session.ID)
+
+	// Redirecionar para a página de visualização
+	http.Redirect(w, r, "/view", http.StatusSeeOther)
+}
+
+// callClientImportJson chama o serviço gRPC para converter JSON para NACHA
+func callClientImportJson(jsonContent string) string {
+	// Simular a conversão JSON para NACHA
+	// Em uma implementação real, isso chamaria o serviço gRPC
+
+	// Primeiro, tentar parsear o JSON para verificar se é válido
+	var jsonData map[string]interface{}
+	if err := json.Unmarshal([]byte(jsonContent), &jsonData); err != nil {
+		return fmt.Sprintf("❌ JSON inválido: %v", err)
+	}
+
+	// Verificar se tem a estrutura básica de um arquivo NACHA
+	if _, hasHeader := jsonData["Header"]; !hasHeader {
+		return "❌ JSON deve conter um campo 'Header'"
+	}
+
+	if _, hasBatches := jsonData["Batches"]; !hasBatches {
+		return "❌ JSON deve conter um campo 'Batches'"
+	}
+
+	if _, hasControl := jsonData["Control"]; !hasControl {
+		return "❌ JSON deve conter um campo 'Control'"
+	}
+
+	// Simular a conversão para formato NACHA
+	// Em uma implementação real, isso usaria o serviço gRPC ImportFromJson
+	nachaContent := convertJsonToNacha(jsonData)
+
+	if nachaContent == "" {
+		return "❌ Erro ao converter JSON para formato NACHA"
+	}
+
+	return nachaContent
+}
+
+// convertJsonToNacha converte dados JSON para formato NACHA
+func convertJsonToNacha(jsonData map[string]interface{}) string {
+	var lines []string
+
+	// Processar Header (Record Type 1)
+	if header, ok := jsonData["Header"].(map[string]interface{}); ok {
+		line := "1"  // Record Type
+		line += "01" // Priority Code
+		line += fmt.Sprintf("%-10s", getStringValue(header, "ImmediateDestination", " 123456789"))
+		line += fmt.Sprintf("%-10s", getStringValue(header, "ImmediateOrigin", " 987654321"))
+		line += fmt.Sprintf("%-6s", getStringValue(header, "FileCreationDate", time.Now().Format("060102")))
+		line += fmt.Sprintf("%-4s", getStringValue(header, "FileCreationTime", time.Now().Format("1504")))
+		line += fmt.Sprintf("%-1s", getStringValue(header, "FileIDModifier", "A"))
+		line += "094" // Record Size
+		line += "10"  // Blocking Factor
+		line += "1"   // Format Code
+		line += fmt.Sprintf("%-23s", getStringValue(header, "DestinationName", "DESTINATION BANK"))
+		line += fmt.Sprintf("%-23s", getStringValue(header, "OriginName", "ORIGIN BANK"))
+		line += fmt.Sprintf("%-8s", getStringValue(header, "ReferenceCode", ""))
+		lines = append(lines, line)
+	}
+
+	// Processar Batches
+	if batches, ok := jsonData["Batches"].([]interface{}); ok {
+		for batchNum, batchData := range batches {
+			if batch, ok := batchData.(map[string]interface{}); ok {
+				// Batch Header (Record Type 5)
+				line := "5" // Record Type
+				line += fmt.Sprintf("%-3s", getStringValue(batch, "ServiceClassCode", "200"))
+				line += fmt.Sprintf("%-16s", getStringValue(batch, "CompanyName", "COMPANY NAME"))
+				line += fmt.Sprintf("%-20s", getStringValue(batch, "CompanyDiscretionaryData", ""))
+				line += fmt.Sprintf("%-10s", getStringValue(batch, "CompanyIdentification", "1234567890"))
+				line += fmt.Sprintf("%-3s", getStringValue(batch, "StandardEntryClass", "PPD"))
+				line += fmt.Sprintf("%-10s", getStringValue(batch, "CompanyEntryDescription", "PAYROLL"))
+				line += fmt.Sprintf("%-6s", getStringValue(batch, "CompanyDescriptiveDate", ""))
+				line += fmt.Sprintf("%-6s", getStringValue(batch, "EffectiveEntryDate", time.Now().Format("060102")))
+				line += fmt.Sprintf("%-3s", getStringValue(batch, "SettlementDate", ""))
+				line += "1" // Originator Status Code
+				line += fmt.Sprintf("%-8s", getStringValue(batch, "OriginatingDFI", "12345678"))
+				line += fmt.Sprintf("%07d", batchNum+1) // Batch Number
+				lines = append(lines, line)
+
+				// Processar Entries
+				if entries, ok := batch["Entries"].([]interface{}); ok {
+					for entryNum, entryData := range entries {
+						if entry, ok := entryData.(map[string]interface{}); ok {
+							// Entry Detail (Record Type 6)
+							line := "6" // Record Type
+							line += fmt.Sprintf("%-2s", getStringValue(entry, "TransactionCode", "22"))
+							line += fmt.Sprintf("%-8s", getStringValue(entry, "ReceivingDFI", "87654321"))
+							line += fmt.Sprintf("%-1s", getStringValue(entry, "CheckDigit", "0"))
+							line += fmt.Sprintf("%-17s", getStringValue(entry, "DFIAccountNumber", "123456789"))
+
+							// Amount
+							amount := int64(0)
+							if amountVal, ok := entry["Amount"]; ok {
+								if amountFloat, ok := amountVal.(float64); ok {
+									amount = int64(amountFloat)
+								}
+							}
+							line += fmt.Sprintf("%010d", amount)
+
+							line += fmt.Sprintf("%-15s", getStringValue(entry, "IndividualIDNumber", ""))
+							line += fmt.Sprintf("%-22s", getStringValue(entry, "IndividualName", "JOHN DOE"))
+							line += fmt.Sprintf("%-2s", getStringValue(entry, "DiscretionaryData", ""))
+							line += "0"                                           // Addenda Record Indicator
+							line += fmt.Sprintf("%08d%07d", 12345678, entryNum+1) // Trace Number
+							lines = append(lines, line)
+						}
+					}
+				}
+
+				// Batch Control (Record Type 8)
+				line = "8" // Record Type
+				line += fmt.Sprintf("%-3s", getStringValue(batch, "ServiceClassCode", "200"))
+
+				// Entry/Addenda Count
+				entryCount := 0
+				if entries, ok := batch["Entries"].([]interface{}); ok {
+					entryCount = len(entries)
+				}
+				line += fmt.Sprintf("%06d", entryCount)
+
+				line += fmt.Sprintf("%010d", 0) // Entry Hash (simplified)
+				line += fmt.Sprintf("%012d", 0) // Total Debit Amount
+				line += fmt.Sprintf("%012d", 0) // Total Credit Amount
+				line += fmt.Sprintf("%-10s", getStringValue(batch, "CompanyIdentification", "1234567890"))
+				line += fmt.Sprintf("%-19s", "") // Message Authentication Code
+				line += fmt.Sprintf("%-6s", "")  // Reserved
+				line += fmt.Sprintf("%-8s", getStringValue(batch, "OriginatingDFI", "12345678"))
+				line += fmt.Sprintf("%07d", batchNum+1) // Batch Number
+				lines = append(lines, line)
+			}
+		}
+	}
+
+	// File Control (Record Type 9)
+	batchCount := 0
+	if batches, ok := jsonData["Batches"].([]interface{}); ok {
+		batchCount = len(batches)
+	}
+
+	line := "9"                                      // Record Type
+	line += fmt.Sprintf("%06d", batchCount)          // Batch Count
+	line += fmt.Sprintf("%06d", (len(lines)+1+9)/10) // Block Count (simplified)
+	line += fmt.Sprintf("%08d", 0)                   // Entry/Addenda Count
+	line += fmt.Sprintf("%010d", 0)                  // Entry Hash
+	line += fmt.Sprintf("%012d", 0)                  // Total Debit Amount
+	line += fmt.Sprintf("%012d", 0)                  // Total Credit Amount
+	line += fmt.Sprintf("%-39s", "")                 // Reserved
+	lines = append(lines, line)
+
+	// Pad to block boundary (10 records per block)
+	for len(lines)%10 != 0 {
+		lines = append(lines, strings.Repeat("9", 94))
+	}
+
+	return strings.Join(lines, "\n")
+}
+
+// getStringValue extrai valor string de um map com valor padrão
+func getStringValue(data map[string]interface{}, key, defaultValue string) string {
+	if val, ok := data[key]; ok {
+		if str, ok := val.(string); ok {
+			return str
+		}
+	}
+	return defaultValue
+}
+
 func main() {
 	// Criar diretório temp se não existir
 	os.MkdirAll("temp", 0755)
@@ -1008,8 +1363,16 @@ func main() {
 		MaxHeaderBytes: 1 << 20, // 1MB
 	}
 
-	// Servir arquivos estáticos
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
+	// Servir arquivos estáticos com headers para desabilitar cache
+	http.HandleFunc("/static/", func(w http.ResponseWriter, r *http.Request) {
+		// Desabilitar cache para CSS e JS
+		if strings.HasSuffix(r.URL.Path, ".css") || strings.HasSuffix(r.URL.Path, ".js") {
+			w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+			w.Header().Set("Pragma", "no-cache")
+			w.Header().Set("Expires", "0")
+		}
+		http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))).ServeHTTP(w, r)
+	})
 
 	// Rotas
 	http.HandleFunc("/", homeHandler)
@@ -1019,6 +1382,7 @@ func main() {
 	http.HandleFunc("/view", viewHandler)
 	http.HandleFunc("/export", exportHandler)
 	http.HandleFunc("/details", detailsHandler)
+	http.HandleFunc("/import", importHandler)
 
 	log.Println("🌐 Aplicação Web NACHA iniciando na porta 8080")
 	log.Println("📊 Funcionalidades disponíveis:")
@@ -1028,6 +1392,7 @@ func main() {
 	log.Println("   • Exportação em 7 formatos diferentes")
 	log.Println("   • Detalhes de Transações por rastreamento")
 	log.Println("   • Gerenciamento de Sessão com arquivos temporários")
+	log.Println("   💡 Cache desabilitado para CSS/JS - mudanças aplicadas imediatamente")
 	log.Println("⚠️  Certifique-se de que o servidor gRPC NACHA esteja executando na porta 50051")
 	log.Println("🔗 Acesse: http://localhost:8080")
 

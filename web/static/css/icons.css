@@ -1,4 +1,4 @@
-/* Modern Icon System */
+/* Professional Icon System */
 :root {
     --icon-size: 1.2rem;
     --icon-size-sm: 1rem;
@@ -9,7 +9,7 @@
     --icon-color-success: var(--success-color);
     --icon-color-warning: var(--warning-color);
     --icon-color-error: var(--error-color);
-    --icon-color-info: var(--info-color);
+    --icon-color-info: var(--secondary-color);
 }
 
 .icon {
@@ -18,8 +18,10 @@
     display: inline-block;
     vertical-align: middle;
     fill: var(--icon-color);
-    stroke: none;
-    transition: all var(--transition-normal);
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    transition: all var(--transition);
 }
 
 .icon--sm { 
@@ -37,11 +39,11 @@
     height: var(--icon-size-xl); 
 }
 
-.icon--primary { fill: var(--icon-color-primary); }
-.icon--success { fill: var(--icon-color-success); }
-.icon--warning { fill: var(--icon-color-warning); }
-.icon--error { fill: var(--icon-color-error); }
-.icon--info { fill: var(--icon-color-info); }
+.icon--primary { color: var(--icon-color-primary); }
+.icon--success { color: var(--icon-color-success); }
+.icon--warning { color: var(--icon-color-warning); }
+.icon--error { color: var(--icon-color-error); }
+.icon--info { color: var(--icon-color-info); }
 
 /* Icon Button */
 .icon-btn {
@@ -51,25 +53,25 @@
     padding: 0.5rem 1rem;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    background: var(--glass-background);
+    background: var(--surface-color);
     color: var(--text-primary);
     text-decoration: none;
-    transition: all var(--transition-normal);
-    backdrop-filter: blur(10px);
+    transition: all var(--transition);
 }
 
 .icon-btn:hover {
-    background: var(--glass-border);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
+    background: var(--background-secondary);
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
 }
 
 .icon-btn .icon {
-    transition: transform var(--transition-normal);
+    transition: transform var(--transition);
 }
 
 .icon-btn:hover .icon {
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
 /* Icon Containers */
@@ -82,7 +84,6 @@
 .feature-icon .icon {
     width: 2rem;
     height: 2rem;
-    filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.3));
 }
 
 .nav-icon .icon {
@@ -100,6 +101,85 @@
     height: 1.5rem;
 }
 
+/* Logo Icon */
+.logo-icon .icon {
+    width: 2rem;
+    height: 2rem;
+    color: var(--primary-color);
+}
+
+/* Hover Effects */
+.icon-container:hover .icon {
+    transform: scale(1.05);
+}
+
+/* Animation for success/error states */
+@keyframes iconPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.icon--pulse {
+    animation: iconPulse 1.5s ease-in-out infinite;
+}
+
+/* Status Icons */
+.status-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+.status-icon--success {
+    background: rgba(5, 150, 105, 0.1);
+    color: var(--success-color);
+}
+
+.status-icon--error {
+    background: rgba(220, 38, 38, 0.1);
+    color: var(--error-color);
+}
+
+.status-icon--warning {
+    background: rgba(217, 119, 6, 0.1);
+    color: var(--warning-color);
+}
+
+/* Interactive Icons */
+.interactive-icon {
+    cursor: pointer;
+    transition: all var(--transition);
+    border-radius: var(--border-radius-sm);
+    padding: 0.25rem;
+}
+
+.interactive-icon:hover {
+    background: var(--background-secondary);
+    color: var(--primary-color);
+}
+
+/* File Type Icons */
+.file-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--background-secondary);
+    border-radius: var(--border-radius);
+    color: var(--text-secondary);
+    font-size: 1.25rem;
+}
+
+.file-icon--json { color: var(--warning-color); }
+.file-icon--nacha { color: var(--primary-color); }
+.file-icon--csv { color: var(--success-color); }
+.file-icon--pdf { color: var(--error-color); }
+
 /* Specific Icon Styles */
 .icon-home { }
 .icon-create { }
@@ -113,33 +193,4 @@
 .icon-check { }
 .icon-error { }
 .icon-info { }
-.icon-search { }
-
-/* Logo Icon */
-.logo-icon .icon {
-    width: 2rem;
-    height: 2rem;
-    fill: var(--primary-color);
-}
-
-/* Hover Effects */
-.icon-container:hover .icon {
-    transform: scale(1.05);
-}
-
-/* Animation for success/error states */
-@keyframes iconPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.icon--pulse {
-    animation: iconPulse 1s ease-in-out infinite;
-}
-
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-    .icon {
-        filter: brightness(1.1);
-    }
-} 
+.icon-search { } 
